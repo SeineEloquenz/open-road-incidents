@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"><soap:Body><d2LogicalModel xmlns:ns2="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" modelBaseVersion="2"><ns2:payloadPublication xsi:type="ns2:SituationPublication" lang="fr"><ns2:situation id="S1"><ns2:overallSeverity>medium</ns2:overallSeverity>
+          <ns2:situationRecord xsi:type="ns2:RoadOrCarriagewayOrLaneManagement" id="251022-000640-1" version="2">
+            <ns2:situationRecordCreationReference>EVE_DIRO-S-251022-0025-EVE_DIRO-SR-251022-000029</ns2:situationRecordCreationReference>
+            <ns2:situationRecordCreationTime>2025-10-22T09:11:59.094+02:00</ns2:situationRecordCreationTime>
+            <ns2:situationRecordVersionTime>2025-10-22T16:22:40.487+02:00</ns2:situationRecordVersionTime>
+            <ns2:probabilityOfOccurrence>certain</ns2:probabilityOfOccurrence>
+            <ns2:source>
+              <ns2:sourceIdentification>Direction interdépartementale des routes/DIR Ouest</ns2:sourceIdentification>
+              <ns2:reliable>true</ns2:reliable>
+            </ns2:source>
+            <ns2:validity>
+              <ns2:validityStatus>definedByValidityTimeSpec</ns2:validityStatus>
+              <ns2:validityTimeSpecification>
+                <ns2:overallStartTime>2025-10-22T09:11:58.953+02:00</ns2:overallStartTime>
+                <ns2:overallEndTime>2030-01-01T00:00:00.000+01:00</ns2:overallEndTime>
+              </ns2:validityTimeSpecification>
+            </ns2:validity>
+            <ns2:impact>
+              <ns2:numberOfLanesRestricted>1</ns2:numberOfLanesRestricted>
+              <ns2:originalNumberOfLanes>2</ns2:originalNumberOfLanes>
+            </ns2:impact>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">La mesure est obligatoire</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>description</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">Point particulier : début : situé 447 m à l'est de Le Rheu Les Landes d'Apigné, fin : situé 2359 m à l'ouest de Rennes Porte de Lorient</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>locationDescriptor</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">DIR Ouest/District de Rennes/CEI de Rennes</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>locationDescriptor</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">De Lorient vers Rennes</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>locationDescriptor</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:groupOfLocations xsi:type="ns2:Linear">
+              <ns2:supplementaryPositionalDescription>
+                <ns2:affectedCarriagewayAndLanes>
+                  <ns2:carriageway>mainCarriageway</ns2:carriageway>
+                  <ns2:lane>lane1</ns2:lane>
+                </ns2:affectedCarriagewayAndLanes>
+              </ns2:supplementaryPositionalDescription>
+              <ns2:tpegLinearLocation>
+                <ns2:tpegDirection>eastBound</ns2:tpegDirection>
+                <ns2:tpegLinearLocationType>segment</ns2:tpegLinearLocationType>
+                <ns2:to xsi:type="ns2:TpegNonJunctionPoint">
+                  <ns2:pointCoordinates>
+                    <ns2:latitude>48.104973</ns2:latitude>
+                    <ns2:longitude>-1.7477167</ns2:longitude>
+                  </ns2:pointCoordinates>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">Vezin-le-Coquet</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>townName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">N24</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>linkName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                </ns2:to>
+                <ns2:from xsi:type="ns2:TpegNonJunctionPoint">
+                  <ns2:pointCoordinates>
+                    <ns2:latitude>48.102207</ns2:latitude>
+                    <ns2:longitude>-1.7527946</ns2:longitude>
+                  </ns2:pointCoordinates>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">Le Rheu</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>townName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">N24</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>linkName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                </ns2:from>
+              </ns2:tpegLinearLocation>
+              <ns2:alertCLinear xsi:type="ns2:AlertCMethod4Linear">
+                <ns2:alertCLocationCountryCode>F</ns2:alertCLocationCountryCode>
+                <ns2:alertCLocationTableNumber>32</ns2:alertCLocationTableNumber>
+                <ns2:alertCLocationTableVersion>11.0</ns2:alertCLocationTableVersion>
+                <ns2:alertCDirection>
+                  <ns2:alertCDirectionCoded>negative</ns2:alertCDirectionCoded>
+                </ns2:alertCDirection>
+                <ns2:alertCMethod4PrimaryPointLocation>
+                  <ns2:alertCLocation>
+                    <ns2:alertCLocationName>
+                      <ns2:values>
+                        <ns2:value lang="fr">Rennes Porte de Lorient</ns2:value>
+                      </ns2:values>
+                    </ns2:alertCLocationName>
+                    <ns2:specificLocation>47221</ns2:specificLocation>
+                  </ns2:alertCLocation>
+                  <ns2:offsetDistance>
+                    <ns2:offsetDistance>2359</ns2:offsetDistance>
+                  </ns2:offsetDistance>
+                </ns2:alertCMethod4PrimaryPointLocation>
+                <ns2:alertCMethod4SecondaryPointLocation>
+                  <ns2:alertCLocation>
+                    <ns2:alertCLocationName>
+                      <ns2:values>
+                        <ns2:value lang="fr">Le Rheu Les Landes d'Apigné</ns2:value>
+                      </ns2:values>
+                    </ns2:alertCLocationName>
+                    <ns2:specificLocation>47222</ns2:specificLocation>
+                  </ns2:alertCLocation>
+                  <ns2:offsetDistance>
+                    <ns2:offsetDistance>447</ns2:offsetDistance>
+                  </ns2:offsetDistance>
+                </ns2:alertCMethod4SecondaryPointLocation>
+              </ns2:alertCLinear>
+              <ns2:linearWithinLinearElement>
+                <ns2:directionRelativeOnLinearSection>opposite</ns2:directionRelativeOnLinearSection>
+                <ns2:linearElement>
+                  <ns2:roadNumber>N0024</ns2:roadNumber>
+                </ns2:linearElement>
+                <ns2:fromPoint xsi:type="ns2:DistanceFromLinearElementReferent">
+                  <ns2:distanceAlong>0.0</ns2:distanceAlong>
+                  <ns2:fromReferent>
+                    <ns2:referentIdentifier>35PR4G</ns2:referentIdentifier>
+                    <ns2:referentType>referenceMarker</ns2:referentType>
+                  </ns2:fromReferent>
+                </ns2:fromPoint>
+                <ns2:toPoint xsi:type="ns2:DistanceFromLinearElementReferent">
+                  <ns2:distanceAlong>500.0</ns2:distanceAlong>
+                  <ns2:fromReferent>
+                    <ns2:referentIdentifier>35PR4G</ns2:referentIdentifier>
+                    <ns2:referentType>referenceMarker</ns2:referentType>
+                  </ns2:fromReferent>
+                </ns2:toPoint>
+              </ns2:linearWithinLinearElement>
+            </ns2:groupOfLocations>
+            <ns2:situationRecordExtension>
+              <ns2:situationRecordExtendedApproved>
+                <ns2:safetyRelatedMessage>false</ns2:safetyRelatedMessage>
+              </ns2:situationRecordExtendedApproved>
+            </ns2:situationRecordExtension>
+            <ns2:complianceOption>mandatory</ns2:complianceOption>
+            <ns2:roadOrCarriagewayOrLaneManagementType>laneClosures</ns2:roadOrCarriagewayOrLaneManagementType>
+          </ns2:situationRecord>
+</ns2:situation><ns2:situation id="S2">
+          <ns2:situationRecord xsi:type="ns2:WeatherRelatedRoadConditions" id="251023-001144-1" version="1">
+            <ns2:situationRecordCreationTime>2025-10-23T10:44:14.681+02:00</ns2:situationRecordCreationTime>
+            <ns2:situationRecordVersionTime>2025-10-23T10:50:24.868+02:00</ns2:situationRecordVersionTime>
+            <ns2:probabilityOfOccurrence>certain</ns2:probabilityOfOccurrence>
+            <ns2:source>
+              <ns2:sourceIdentification>Direction interdépartementale des routes/DIR Centre-Est</ns2:sourceIdentification>
+              <ns2:sourceName>
+                <ns2:values>
+                  <ns2:value lang="fr">PC Osiris (Chambéry)</ns2:value>
+                </ns2:values>
+              </ns2:sourceName>
+              <ns2:reliable>true</ns2:reliable>
+            </ns2:source>
+            <ns2:validity>
+              <ns2:validityStatus>definedByValidityTimeSpec</ns2:validityStatus>
+              <ns2:validityTimeSpecification>
+                <ns2:overallStartTime>2025-10-23T10:44:14.681+02:00</ns2:overallStartTime>
+                <ns2:overallEndTime>2026-05-29T17:00:00.000+02:00</ns2:overallEndTime>
+              </ns2:validityTimeSpecification>
+            </ns2:validity>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">Le col du Glandon est fermé pour la saison hivernale.
+
+Habituellement le col est fermé pour la saison hivernale du 2ème lundi de novembre jusqu'au dernier vendredi de mai.</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>description</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:generalPublicComment>
+              <ns2:comment>
+                <ns2:values>
+                  <ns2:value lang="fr">situé 19 m à l'est de Col du Glandon</ns2:value>
+                </ns2:values>
+              </ns2:comment>
+              <ns2:commentType>locationDescriptor</ns2:commentType>
+            </ns2:generalPublicComment>
+            <ns2:groupOfLocations xsi:type="ns2:Point">
+              <ns2:tpegPointLocation xsi:type="ns2:TpegSimplePoint">
+                <ns2:tpegDirection>westBound</ns2:tpegDirection>
+                <ns2:tpegSimplePointLocationType>nonLinkedPoint</ns2:tpegSimplePointLocationType>
+                <ns2:point xsi:type="ns2:TpegNonJunctionPoint">
+                  <ns2:pointCoordinates>
+                    <ns2:latitude>45.23877</ns2:latitude>
+                    <ns2:longitude>6.1781034</ns2:longitude>
+                  </ns2:pointCoordinates>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">Saint-Colomban-des-Villards</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>townName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                  <ns2:name>
+                    <ns2:descriptor>
+                      <ns2:values>
+                        <ns2:value lang="fr">D926</ns2:value>
+                      </ns2:values>
+                    </ns2:descriptor>
+                    <ns2:tpegOtherPointDescriptorType>linkName</ns2:tpegOtherPointDescriptorType>
+                  </ns2:name>
+                </ns2:point>
+              </ns2:tpegPointLocation>
+              <ns2:alertCPoint xsi:type="ns2:AlertCMethod4Point">
+                <ns2:alertCLocationCountryCode>F</ns2:alertCLocationCountryCode>
+                <ns2:alertCLocationTableNumber>32</ns2:alertCLocationTableNumber>
+                <ns2:alertCLocationTableVersion>11.0</ns2:alertCLocationTableVersion>
+                <ns2:alertCDirection>
+                  <ns2:alertCDirectionCoded>positive</ns2:alertCDirectionCoded>
+                </ns2:alertCDirection>
+                <ns2:alertCMethod4PrimaryPointLocation>
+                  <ns2:alertCLocation>
+                    <ns2:alertCLocationName>
+                      <ns2:values>
+                        <ns2:value lang="fr">Col du Glandon</ns2:value>
+                      </ns2:values>
+                    </ns2:alertCLocationName>
+                    <ns2:specificLocation>33202</ns2:specificLocation>
+                  </ns2:alertCLocation>
+                  <ns2:offsetDistance>
+                    <ns2:offsetDistance>19</ns2:offsetDistance>
+                  </ns2:offsetDistance>
+                </ns2:alertCMethod4PrimaryPointLocation>
+              </ns2:alertCPoint>
+            </ns2:groupOfLocations>
+            <ns2:situationRecordExtension>
+              <ns2:situationRecordExtendedApproved>
+                <ns2:safetyRelatedMessage>true</ns2:safetyRelatedMessage>
+              </ns2:situationRecordExtendedApproved>
+            </ns2:situationRecordExtension>
+            <ns2:drivingConditionType>impossible</ns2:drivingConditionType>
+            <ns2:weatherRelatedRoadConditionType>snowOnTheRoad</ns2:weatherRelatedRoadConditionType>
+          </ns2:situationRecord>
+</ns2:situation></ns2:payloadPublication></d2LogicalModel></soap:Body></soap:Envelope>

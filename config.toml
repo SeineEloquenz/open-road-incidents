@@ -1,0 +1,70 @@
+valhalla_url = "http://localhost:8002"
+user_agent = "open-road-incidents/0.1 (+https://example.org/contact)"
+out_dir = "out"
+state_dir = "state"
+
+[[source]]
+id = "fi-digitraffic"
+country = "FI"
+format = "digitraffic-fi"
+url = "https://tie.digitraffic.fi/api/traffic-message/v2"
+poll_secs = 300
+licence = "CC-BY-4.0"
+attribution = "Fintraffic / digitraffic.fi"
+headers = { "Digitraffic-User" = "open-road-incidents" }
+
+[[source]]
+id = "fr-dir"
+country = "FR"
+format = "datex"
+url = "http://tipi.bison-fute.gouv.fr/bison-fute-ouvert/publicationsDIR/Evenementiel-DIR/grt/RRN/content.xml"
+poll_secs = 300
+licence = "Licence-Ouverte-2.0"
+attribution = "Bison Futé, DIR (data.gouv.fr)"
+
+[[source]]
+id = "lu-cita"
+country = "LU"
+format = "datex"
+url = "https://cita.lu/info_trafic/datex/situationrecord36"
+poll_secs = 120
+licence = "CC0-1.0"
+attribution = "CITA Luxembourg"
+
+[[source]]
+id = "nl-ndw"
+country = "NL"
+format = "datex"
+url = "https://opendata.ndw.nu/actueel_beeld.xml.gz"
+poll_secs = 120
+licence = "CC0-1.0"
+attribution = "NDW"
+
+[[source]]
+id = "be-vlaanderen"
+country = "BE"
+format = "datex"
+url = "https://www.verkeerscentrum.be/uitwisseling/datex2v3full"
+poll_secs = 120
+licence = "CC-BY-4.0"
+attribution = "Vlaams Verkeerscentrum"
+
+# Reuse terms not published. Get written confirmation from DGT (nap@dgt.es).
+[[source]]
+id = "es-dgt"
+country = "ES"
+format = "datex"
+url = "https://nap.dgt.es/datex2/v3/dgt/SituationPublication/datex2_v37.xml"
+poll_secs = 300
+licence = "unconfirmed"
+attribution = "DGT"
+
+# No official licence found. Get written confirmation of reuse terms from Autobahn GmbH.
+[[source]]
+id = "de-autobahn"
+country = "DE"
+format = "autobahn"
+url = "https://verkehr.autobahn.de/o/autobahn"
+poll_secs = 900
+licence = "unconfirmed"
+attribution = "Die Autobahn GmbH des Bundes"

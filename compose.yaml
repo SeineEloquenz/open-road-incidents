@@ -1,0 +1,14 @@
+services:
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:latest
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./.valhalla:/custom_files
+    environment:
+      tile_urls: ${VALHALLA_TILE_URLS:-https://download.geofabrik.de/europe/luxembourg-latest.osm.pbf}
+      force_rebuild: ${VALHALLA_FORCE_REBUILD:-False}
+      serve_tiles: "True"
+      build_admins: "False"
+      build_time_zones: "False"
+      build_elevation: "False"

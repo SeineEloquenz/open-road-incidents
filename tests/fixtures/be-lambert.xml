@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><ns4:payload modelBaseVersion="3" xmlns="http://datex2.eu/schema/3/common" xmlns:ns2="http://datex2.eu/schema/3/situation" xmlns:ns4="http://datex2.eu/schema/3/d2Payload" xmlns:ns3="http://datex2.eu/schema/3/locationReferencing">
+  <ns4:situation id="EVT22443543">
+    <ns2:situationVersionTime>2026-09-08T14:17:03.979+02:00</ns2:situationVersionTime>
+    <ns2:headerInformation>
+      <confidentiality>noRestriction</confidentiality>
+      <informationStatus>real</informationStatus>
+    </ns2:headerInformation>
+    <ns2:situationRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns2:RoadOrCarriagewayOrLaneManagement" id="22443543-M-RNL" version="1">
+      <ns2:situationRecordCreationTime>2026-09-08T14:17:03.982+02:00</ns2:situationRecordCreationTime>
+      <ns2:situationRecordVersionTime>2026-09-08T14:17:03.979+02:00</ns2:situationRecordVersionTime>
+      <ns2:probabilityOfOccurrence>certain</ns2:probabilityOfOccurrence>
+      <ns2:safetyRelatedMessage>false</ns2:safetyRelatedMessage>
+      <ns2:validity>
+        <validityStatus>active</validityStatus>
+        <validityTimeSpecification>
+          <overallStartTime>2026-09-08T14:17:03.982+02:00</overallStartTime>
+          <overallEndTime>2026-11-30T18:00:00.000+01:00</overallEndTime>
+        </validityTimeSpecification>
+      </ns2:validity>
+      <ns2:locationReference xsi:type="ns3:SingleRoadLinearLocation">
+        <ns3:gmlLineString srsName="EPSG:31370">
+          <ns3:posList>131644.95 191393.25 131641.31 191380.89 131640.94 191379.64 131635.72 191354.89 131632.31 191334.0 131631.19 191327.1</ns3:posList>
+        </ns3:gmlLineString>
+        <ns3:alertCLinear xsi:type="ns3:AlertCMethod4Linear">
+          <ns3:alertCLocationCountryCode>BE</ns3:alertCLocationCountryCode>
+          <ns3:alertCLocationTableNumber>601</ns3:alertCLocationTableNumber>
+          <ns3:alertCLocationTableVersion>3.8</ns3:alertCLocationTableVersion>
+          <ns3:alertCDirection>
+            <ns3:alertCDirectionCoded>negative</ns3:alertCDirectionCoded>
+          </ns3:alertCDirection>
+          <ns3:alertCMethod4PrimaryPointLocation>
+            <ns3:alertCLocation>
+              <ns3:specificLocation>22210</ns3:specificLocation>
+            </ns3:alertCLocation>
+            <ns3:offsetDistance>
+              <ns3:offsetDistance>57</ns3:offsetDistance>
+            </ns3:offsetDistance>
+          </ns3:alertCMethod4PrimaryPointLocation>
+          <ns3:alertCMethod4SecondaryPointLocation>
+            <ns3:alertCLocation>
+              <ns3:specificLocation>22208</ns3:specificLocation>
+            </ns3:alertCLocation>
+            <ns3:offsetDistance>
+              <ns3:offsetDistance>793</ns3:offsetDistance>
+            </ns3:offsetDistance>
+          </ns3:alertCMethod4SecondaryPointLocation>
+        </ns3:alertCLinear>
+      </ns2:locationReference>
+      <ns2:complianceOption>advisory</ns2:complianceOption>
+      <ns2:roadOrCarriagewayOrLaneManagementType>newRoadworksLayout</ns2:roadOrCarriagewayOrLaneManagementType>
+    </ns2:situationRecord>
+  </ns4:situation>
+</ns4:payload>

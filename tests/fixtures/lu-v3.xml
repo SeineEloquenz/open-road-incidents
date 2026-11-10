@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<d2:payload xsi:type="sit:SituationPublication" lang="fr" modelBaseVersion="3" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:d2="http://datex2.eu/schema/3/d2Payload" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <com:feedDescription>
+        <com:values>
+            <com:value lang="en">Active and planned events on Luxembourg highways</com:value>
+        </com:values>
+    </com:feedDescription>
+    <com:publicationTime>2026-11-10T23:55:02+01:00</com:publicationTime>
+    <com:publicationCreator>
+        <com:country>LU</com:country>
+        <com:nationalIdentifier>PCH</com:nationalIdentifier>
+    </com:publicationCreator>
+    <sit:situation id="238510">
+        <sit:headerInformation>
+            <com:confidentiality>noRestriction</com:confidentiality>
+            <com:informationStatus>real</com:informationStatus>
+        </sit:headerInformation>
+        <sit:situationRecord xsi:type="sit:MaintenanceWorks" id="238510-1" version="4">
+            <sit:situationRecordCreationTime>2026-11-10T21:05:07+01:00</sit:situationRecordCreationTime>
+            <sit:situationRecordVersionTime>2026-11-10T21:05:43+01:00</sit:situationRecordVersionTime>
+            <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+            <sit:safetyRelatedMessage>true</sit:safetyRelatedMessage>
+            <sit:validity>
+                <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+                <com:validityTimeSpecification>
+                    <com:overallStartTime>2026-11-10T21:05:07+01:00</com:overallStartTime>
+                </com:validityTimeSpecification>
+            </sit:validity>
+            <sit:impact>
+                <sit:numberOfLanesRestricted>1</sit:numberOfLanesRestricted>
+                <sit:numberOfOperationalLanes>0</sit:numberOfOperationalLanes>
+            </sit:impact>
+            <sit:locationReference xsi:type="loc:LocationGroupByList">
+                <loc:locationContainedInGroup xsi:type="loc:LinearLocation">
+                    <loc:supplementaryPositionalDescription>
+                        <loc:lengthAffected>591.0</loc:lengthAffected>
+                        <loc:locationDescription>
+                            <com:values>
+                                <com:value lang="fr">Echangeur</com:value>
+                            </com:values>
+                        </loc:locationDescription>
+                        <loc:carriageway>
+                            <loc:carriageway>mainCarriageway</loc:carriageway>
+                            <loc:originalNumberOfLanes>1</loc:originalNumberOfLanes>
+                            <loc:lane>
+                                <loc:laneNumber>1</loc:laneNumber>
+                                <loc:laneUsage>rightLane</loc:laneUsage>
+                            </loc:lane>
+                            <loc:lane>
+                                <loc:laneUsage>hardShoulder</loc:laneUsage>
+                            </loc:lane>
+                        </loc:carriageway>
+                        <loc:roadInformation>
+                            <loc:roadDestination>Steinfort: entrée vers Arlon</loc:roadDestination>
+                            <loc:roadName>A6</loc:roadName>
+                        </loc:roadInformation>
+                    </loc:supplementaryPositionalDescription>
+                    <loc:gmlLineString srsDimension="2" srsName="urn:ogc:def:crs:EPSG::4326">
+                        <loc:posList>49.636867 5.954695 49.636765 5.954539 49.636753 5.954473 49.636781 5.953493 49.63677 5.953314 49.636716 5.95305 49.636611 5.952845 49.636252 5.952429 49.636174 5.952315 49.636048 5.952045 49.635994 5.951885 49.635934 5.951582 49.63592 5.951209 49.635934 5.950974 49.636166 5.948271 49.636242 5.947087</loc:posList>
+                    </loc:gmlLineString>
+                </loc:locationContainedInGroup>
+                <loc:locationContainedInGroup xsi:type="loc:PointLocation">
+                    <loc:pointByCoordinates>
+                        <loc:bearing>220</loc:bearing>
+                        <loc:pointCoordinates>
+                            <loc:latitude>49.636868</loc:latitude>
+                            <loc:longitude>5.954695</loc:longitude>
+                        </loc:pointCoordinates>
+                    </loc:pointByCoordinates>
+                </loc:locationContainedInGroup>
+            </sit:locationReference>
+            <sit:roadMaintenanceType>maintenanceWork</sit:roadMaintenanceType>
+        </sit:situationRecord>
+    </sit:situation>
+</d2:payload>
