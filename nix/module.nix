@@ -104,11 +104,13 @@ in
         User = "open-road-incidents";
         Group = "open-road-incidents";
         WorkingDirectory = graphDir;
-        ExecStartPre = pkgs.writeShellScript "valhalla-swap-graph" ''
+        ExecStartPre = "+" + pkgs.writeShellScript "valhalla-swap-graph" ''
+          cd ${graphDir}
           if [ -f incoming/valhalla_tiles.tar ] && [ -f incoming/traffic.tar ]; then
             mv incoming/valhalla_tiles.tar valhalla_tiles.tar
             mv incoming/traffic.tar traffic.tar
           fi
+          chown open-road-incidents:open-road-incidents valhalla_tiles.tar traffic.tar
         '';
         ExecStart = "${cfg.valhalla.package}/bin/valhalla_service ${valhallaConfig} ${toString cfg.valhalla.threads}";
         Restart = "on-failure";
