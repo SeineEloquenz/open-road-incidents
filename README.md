@@ -1,6 +1,6 @@
 # open-road-incidents
 
-Collects open road incident and roadworks feeds from European road authorities, matches them to OpenStreetMap ways with Valhalla and publishes them as static files.
+Collects open road incident and roadworks feeds from European road authorities, matches them to OpenStreetMap ways with Valhalla and publishes them as static files. Active closures are written into Valhalla's live traffic, so the same Valhalla routes around them.
 
 ## Sources
 
@@ -28,7 +28,32 @@ cargo run --release -- check nl-ndw
 
 Valhalla builds tiles from every `.osm.pbf` in `.valhalla/`. Add extracts for the covered countries and restart with `VALHALLA_FORCE_REBUILD=True`. Incidents outside the loaded extracts get `match_status: failed`.
 
-The config is read from `config.toml` or `$ORI_CONFIG`. Set `user_agent` to something that identifies you before polling public feeds.
+The config is read from `config.toml` or `$ORI_CONFIG`. Set `user_agent` to something that identifies you before polling public feeds. With `traffic_extract` set, closures are written to that `traffic.tar`, which must be writable and created with `valhalla_build_extract -t`.
+
+## Closures
+
+Valhalla only applies closures to `auto` routes that set `"date_time": {"type": 0}`. Bicycle and pedestrian routes ignore them. Matched edge ids belong to one graph build, so a new graph needs Valhalla and this service restarted together.
+
+## Server
+
+`nixosModules.default` runs Valhalla and the collector as `services.open-road-incidents`. With `virtualHost` set, nginx serves `out/v1/` and passes only `/route` and `/status` to Valhalla, rate limited per client.
+
+```nix
+services.open-road-incidents = {
+  enable = true;
+  virtualHost = "roads.example.org";
+};
+```
+
+The graph is built elsewhere and uploaded:
+
+```sh
+nix run .#build-graph -- graph                     # the covered countries, or pass regions like europe/luxembourg
+rsync graph/work/{valhalla_tiles,traffic}.tar server:/var/lib/open-road-incidents/valhalla/incoming/
+ssh server systemctl restart valhalla              # swaps in the new graph and restarts the collector
+```
+
+`CONCURRENCY` limits build threads, which lowers memory use.
 
 ## Output
 

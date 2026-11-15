@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Builds the Valhalla routing graph and an empty live traffic extract for Geofabrik regions.
+# Usage: build-graph OUT_DIR [REGION...], regions like europe/luxembourg.
+set -euo pipefail
+
+out=${1:?usage: build-graph OUT_DIR [REGION...]}
+shift
+regions=("$@")
+if [ ${#regions[@]} -eq 0 ]; then
+  regions=(europe/finland europe/france europe/luxembourg europe/netherlands europe/belgium europe/spain europe/germany)
+fi
+concurrency=${CONCURRENCY:-$(($(nproc) / 2))}
+
+mkdir -p "$out/pbf" "$out/work"
+out=$(cd "$out" && pwd)
+pbfs=()
+for region in "${regions[@]}"; do
+  file="$out/pbf/${region//\//_}.osm.pbf"
+  curl -fsSL -A "OpenRoadIncidents/0.1" -z "$file" -o "$file" "https://download.geofabrik.de/$region-latest.osm.pbf"
+  pbfs+=("$file")
+done
+
+rm -rf "$out/work/tiles"
+config="$out/work/valhalla.json"
+valhalla_build_config \
+  --mjolnir-tile-dir "$out/work/tiles" \
+  --mjolnir-tile-extract "$out/work/valhalla_tiles.tar" \
+  --mjolnir-traffic-extract "$out/work/traffic.tar" \
+  --mjolnir-concurrency "$concurrency" \
+  --mjolnir-admin "" \
+  --mjolnir-timezone "" >"$config"
+valhalla_build_tiles -c "$config" "${pbfs[@]}"
+valhalla_build_extract -c "$config" -t -O
+rm -rf "$out/work/tiles"
+echo "Built $out/work/valhalla_tiles.tar and $out/work/traffic.tar"
