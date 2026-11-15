@@ -1,3 +1,4 @@
+mod closures;
 mod datex;
 mod geo;
 mod http;
@@ -16,6 +17,7 @@ use chrono::Utc;
 use log::{error, info, warn};
 use serde::Deserialize;
 
+use closures::Closures;
 use http::Http;
 use matcher::Matcher;
 use model::MatchStatus;
@@ -25,6 +27,8 @@ use sources::Source;
 #[derive(Deserialize)]
 struct Config {
     valhalla_url: String,
+    /// Valhalla's live traffic extract, where active closures are written.
+    traffic_extract: Option<PathBuf>,
     user_agent: String,
     out_dir: PathBuf,
     state_dir: PathBuf,
@@ -50,6 +54,11 @@ fn main() -> Result<()> {
 fn run(config: &Config, once: bool) -> Result<()> {
     let http = Http::new(&config.user_agent);
     let mut matcher = Matcher::open(&config.valhalla_url, config.state_dir.join("match-cache.json"))?;
+    let mut closures = config
+        .traffic_extract
+        .as_deref()
+        .map(|path| Closures::open(path, config.state_dir.join("closures.json"), matcher.tileset()))
+        .transpose()?;
     let enabled: Vec<&Source> = config.sources.iter().filter(|s| s.enabled).collect();
     let mut states: BTreeMap<String, SourceState> = BTreeMap::new();
     let mut attempts: BTreeMap<String, Instant> = BTreeMap::new();
@@ -93,6 +102,10 @@ fn run(config: &Config, once: bool) -> Result<()> {
         }
         if changed {
             matcher.save()?;
+            if let Some(closures) = &mut closures {
+                let edges = closures.apply(states.values().flat_map(|s| &s.incidents), now)?;
+                info!("{edges} edges closed");
+            }
             publish::publish(&config.out_dir, &enabled, &states, now)?;
             info!("published to {}", config.out_dir.display());
         }

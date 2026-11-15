@@ -13,5 +13,6 @@ proj4rs = "0.3.0"
 roxmltree = "0.21.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
+tar = { version = "0.4", default-features = false }
 toml = "1.2.1"
 ureq = { version = "2", features = ["json"] }

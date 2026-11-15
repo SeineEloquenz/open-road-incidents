@@ -1,5 +1,6 @@
 valhalla_url = "http://localhost:8002"
-user_agent = "open-road-incidents/0.1 (+https://example.org/contact)"
+traffic_extract = ".valhalla/traffic.tar"
+user_agent = "OpenRoadIncidents/0.1"
 out_dir = "out"
 state_dir = "state"
 
@@ -11,7 +12,7 @@ url = "https://tie.digitraffic.fi/api/traffic-message/v2"
 poll_secs = 300
 licence = "CC-BY-4.0"
 attribution = "Fintraffic / digitraffic.fi"
-headers = { "Digitraffic-User" = "open-road-incidents" }
+headers = { "Digitraffic-User" = "OpenRoadIncidents" }
 
 [[source]]
 id = "fr-dir"

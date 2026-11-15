@@ -15,9 +15,32 @@ const MAX_UNMATCHED_SHARE: f64 = 0.2;
 const MAX_POINT_OFFSET_M: f64 = 50.0;
 const MAX_DETOUR_FACTOR: f64 = 3.0;
 
+const CACHE_VERSION: u32 = 2;
+
+#[derive(Clone, Default, Serialize, Deserialize)]
+struct Matched {
+    way_ids: Vec<i64>,
+    edge_ids: Vec<u64>,
+}
+
+impl Matched {
+    fn extend(&mut self, other: Matched) {
+        for id in other.way_ids {
+            if !self.way_ids.contains(&id) {
+                self.way_ids.push(id);
+            }
+        }
+        for id in other.edge_ids {
+            if !self.edge_ids.contains(&id) {
+                self.edge_ids.push(id);
+            }
+        }
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 struct Cached {
-    way_ids: Option<Vec<i64>>,
+    matched: Option<Matched>,
 }
 
 /// Matches incident geometry to OSM ways through a Valhalla server, caching results per tileset.
@@ -54,28 +77,33 @@ impl Matcher {
         })
     }
 
-    /// Fills `osm_way_ids` and `match_status`. Errors mean Valhalla itself failed and the incident stays pending.
+    /// Fills `osm_way_ids`, `edge_ids` and `match_status`. Errors mean Valhalla itself failed and the incident stays pending.
     pub fn match_incident(&mut self, inc: &mut Incident) -> Result<()> {
-        let key = geo::stable_hash(&serde_json::to_vec(&(&inc.shape, &self.tileset))?);
+        let key = geo::stable_hash(&serde_json::to_vec(&(&inc.shape, &self.tileset, CACHE_VERSION))?);
         self.used.insert(key);
         let cached = match self.cache.get(&key) {
             Some(c) => c.clone(),
             None => {
                 let c = Cached {
-                    way_ids: self.match_shape(&inc.shape)?,
+                    matched: self.match_shape(&inc.shape)?,
                 };
                 self.cache.insert(key, c.clone());
                 c
             }
         };
-        match cached.way_ids {
-            Some(ids) => {
-                inc.osm_way_ids = ids;
+        match cached.matched {
+            Some(m) => {
+                inc.osm_way_ids = m.way_ids;
+                inc.edge_ids = m.edge_ids;
                 inc.match_status = MatchStatus::Matched;
             }
             None => inc.match_status = MatchStatus::Failed,
         }
         Ok(())
+    }
+
+    pub fn tileset(&self) -> &str {
+        &self.tileset
     }
 
     /// Persists the cache, dropping entries no current incident used.
@@ -85,10 +113,10 @@ impl Matcher {
         crate::publish::write_atomic(&self.cache_path, &serde_json::to_vec(&self.cache)?)
     }
 
-    fn match_shape(&self, shape: &Shape) -> Result<Option<Vec<i64>>> {
-        let mut ids = Vec::new();
+    fn match_shape(&self, shape: &Shape) -> Result<Option<Matched>> {
+        let mut all = Matched::default();
         let mut any = false;
-        let parts: Vec<Option<Vec<i64>>> = match shape {
+        let parts: Vec<Option<Matched>> = match shape {
             Shape::Lines(lines) => lines
                 .iter()
                 .filter(|l| l.len() >= 2)
@@ -99,21 +127,17 @@ impl Matcher {
         };
         for part in parts.into_iter().flatten() {
             any = true;
-            for id in part {
-                if !ids.contains(&id) {
-                    ids.push(id);
-                }
-            }
+            all.extend(part);
         }
-        Ok(any.then_some(ids))
+        Ok(any.then_some(all))
     }
 
-    fn trace(&self, line: &[Coord], mode: &str) -> Result<Option<Vec<i64>>> {
+    fn trace(&self, line: &[Coord], mode: &str) -> Result<Option<Matched>> {
         let body = json!({
             "shape": line.iter().map(|c| json!({"lat": c[1], "lon": c[0]})).collect::<Vec<_>>(),
             "costing": "auto",
             "shape_match": mode,
-            "filters": {"attributes": ["edge.way_id", "matched.type", "matched.distance_from_trace_point"], "action": "include"},
+            "filters": {"attributes": ["edge.way_id", "edge.id", "matched.type", "matched.distance_from_trace_point"], "action": "include"},
         });
         let Some(resp) = self.post("trace_attributes", body)? else {
             return Ok(None);
@@ -130,16 +154,17 @@ impl Matcher {
                 return Ok(None);
             }
         }
-        let ids: Vec<i64> = resp["edges"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|e| e["way_id"].as_i64())
-            .collect();
-        Ok(Some(ids).filter(|ids| !ids.is_empty()))
+        let mut matched = Matched::default();
+        for e in resp["edges"].as_array().into_iter().flatten() {
+            matched.extend(Matched {
+                way_ids: e["way_id"].as_i64().into_iter().collect(),
+                edge_ids: e["id"].as_u64().into_iter().collect(),
+            });
+        }
+        Ok(Some(matched).filter(|m| !m.way_ids.is_empty()))
     }
 
-    fn span(&self, [from, to]: [Coord; 2]) -> Result<Option<Vec<i64>>> {
+    fn span(&self, [from, to]: [Coord; 2]) -> Result<Option<Matched>> {
         let body = json!({
             "locations": [{"lat": from[1], "lon": from[0]}, {"lat": to[1], "lon": to[0]}],
             "costing": "auto",
@@ -160,23 +185,36 @@ impl Matcher {
         self.trace(&path, "edge_walk")
     }
 
-    fn locate(&self, p: Coord) -> Result<Option<Vec<i64>>> {
-        let body = json!({"locations": [{"lat": p[1], "lon": p[0]}], "costing": "auto"});
+    /// Matches the nearest road segment in both directions, since a point does not say which one is affected.
+    fn locate(&self, p: Coord) -> Result<Option<Matched>> {
+        let body = json!({"locations": [{"lat": p[1], "lon": p[0]}], "costing": "auto", "verbose": true});
         let Some(resp) = self.post("locate", body)? else {
             return Ok(None);
         };
-        let nearest = resp[0]["edges"]
+        let candidates: Vec<(f64, i64, Option<u64>)> = resp[0]["edges"]
             .as_array()
             .into_iter()
             .flatten()
             .filter_map(|e| {
                 let d = geo::distance(p, [e["correlated_lon"].as_f64()?, e["correlated_lat"].as_f64()?]);
-                Some((d, e["way_id"].as_i64()?))
+                let way = e["edge_info"]["way_id"].as_i64()?;
+                Some((d, way, e["edge_id"]["value"].as_u64()))
             })
-            .min_by(|a, b| a.0.total_cmp(&b.0));
-        Ok(nearest
-            .filter(|(d, _)| *d <= MAX_POINT_OFFSET_M)
-            .map(|(_, id)| vec![id]))
+            .collect();
+        let Some(&(d, way, _)) = candidates.iter().min_by(|a, b| a.0.total_cmp(&b.0)) else {
+            return Ok(None);
+        };
+        if d > MAX_POINT_OFFSET_M {
+            return Ok(None);
+        }
+        Ok(Some(Matched {
+            way_ids: vec![way],
+            edge_ids: candidates
+                .iter()
+                .filter(|c| c.1 == way && (c.0 - d).abs() < 1.0)
+                .filter_map(|c| c.2)
+                .collect(),
+        }))
     }
 
     /// Returns `None` when Valhalla rejects the request, which means the shape cannot be matched.
