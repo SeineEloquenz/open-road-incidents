@@ -1,6 +1,6 @@
 # open-road-incidents
 
-Collects open road incident and roadworks feeds from European road authorities, matches them to OpenStreetMap ways with Valhalla and publishes them as static files. Active closures are written into Valhalla's live traffic, so the same Valhalla routes around them.
+Collects open road incident and roadworks feeds from European road authorities, matches them to OpenStreetMap ways with Valhalla and publishes them as static files. Active closures and roadworks are written into Valhalla's live traffic, so the same Valhalla routes around closed roads and prefers to avoid slowed ones.
 
 ## Sources
 
@@ -28,11 +28,13 @@ cargo run --release -- check nl-ndw
 
 Valhalla builds tiles from every `.osm.pbf` in `.valhalla/`. Add extracts for the covered countries and restart with `VALHALLA_FORCE_REBUILD=True`. Incidents outside the loaded extracts get `match_status: failed`.
 
-The config is read from `config.toml` or `$ORI_CONFIG`. Set `user_agent` to something that identifies you before polling public feeds. With `traffic_extract` set, closures are written to that `traffic.tar`, which must be writable and created with `valhalla_build_extract -t`.
+The config is read from `config.toml` or `$ORI_CONFIG`. Set `user_agent` to something that identifies you before polling public feeds. With `traffic_extract` set, closures and slowdowns are written to that `traffic.tar`, which must be writable and created with `valhalla_build_extract -t`.
 
-## Closures
+## Live traffic
 
-Valhalla only applies closures to `auto` routes that set `"date_time": {"type": 0}`. Bicycle and pedestrian routes ignore them. Matched edge ids belong to one graph build, so a new graph needs Valhalla and this service restarted together.
+Closed roads get speed 0. Roadworks lower the usual speed of their edges: to the reported speed limit, to 60% where lanes are restricted, and to 85% when the feed gives no details. Congestion and other events are left out.
+
+Valhalla only applies live traffic to `auto` routes that set `"date_time": {"type": 0}`. Bicycle and pedestrian routes ignore it. Matched edge ids belong to one graph build, so a new graph needs Valhalla and this service restarted together.
 
 ## Server
 

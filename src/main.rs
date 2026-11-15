@@ -1,4 +1,3 @@
-mod closures;
 mod datex;
 mod geo;
 mod http;
@@ -6,6 +5,7 @@ mod matcher;
 mod model;
 mod publish;
 mod sources;
+mod traffic;
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -17,17 +17,17 @@ use chrono::Utc;
 use log::{error, info, warn};
 use serde::Deserialize;
 
-use closures::Closures;
 use http::Http;
 use matcher::Matcher;
 use model::MatchStatus;
 use publish::SourceState;
 use sources::Source;
+use traffic::LiveTraffic;
 
 #[derive(Deserialize)]
 struct Config {
     valhalla_url: String,
-    /// Valhalla's live traffic extract, where active closures are written.
+    /// Valhalla's live traffic extract, where active closures and slowdowns are written.
     traffic_extract: Option<PathBuf>,
     user_agent: String,
     out_dir: PathBuf,
@@ -54,10 +54,10 @@ fn main() -> Result<()> {
 fn run(config: &Config, once: bool) -> Result<()> {
     let http = Http::new(&config.user_agent);
     let mut matcher = Matcher::open(&config.valhalla_url, config.state_dir.join("match-cache.json"))?;
-    let mut closures = config
+    let mut traffic = config
         .traffic_extract
         .as_deref()
-        .map(|path| Closures::open(path, config.state_dir.join("closures.json"), matcher.tileset()))
+        .map(|path| LiveTraffic::open(path, config.state_dir.join("traffic.json"), matcher.tileset()))
         .transpose()?;
     let enabled: Vec<&Source> = config.sources.iter().filter(|s| s.enabled).collect();
     let mut states: BTreeMap<String, SourceState> = BTreeMap::new();
@@ -102,9 +102,9 @@ fn run(config: &Config, once: bool) -> Result<()> {
         }
         if changed {
             matcher.save()?;
-            if let Some(closures) = &mut closures {
-                let edges = closures.apply(states.values().flat_map(|s| &s.incidents), now)?;
-                info!("{edges} edges closed");
+            if let Some(traffic) = &mut traffic {
+                let (closed, slowed) = traffic.apply(states.values().flat_map(|s| &s.incidents), now)?;
+                info!("{closed} edges closed, {slowed} slowed");
             }
             publish::publish(&config.out_dir, &enabled, &states, now)?;
             info!("published to {}", config.out_dir.display());

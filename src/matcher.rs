@@ -8,19 +8,19 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::geo;
-use crate::model::{Coord, Incident, MatchStatus, Shape};
+use crate::model::{Coord, Edge, Incident, MatchStatus, Shape};
 
 const MAX_MEAN_OFFSET_M: f64 = 30.0;
 const MAX_UNMATCHED_SHARE: f64 = 0.2;
 const MAX_POINT_OFFSET_M: f64 = 50.0;
 const MAX_DETOUR_FACTOR: f64 = 3.0;
 
-const CACHE_VERSION: u32 = 2;
+const CACHE_VERSION: u32 = 3;
 
 #[derive(Clone, Default, Serialize, Deserialize)]
 struct Matched {
     way_ids: Vec<i64>,
-    edge_ids: Vec<u64>,
+    edges: Vec<Edge>,
 }
 
 impl Matched {
@@ -30,9 +30,9 @@ impl Matched {
                 self.way_ids.push(id);
             }
         }
-        for id in other.edge_ids {
-            if !self.edge_ids.contains(&id) {
-                self.edge_ids.push(id);
+        for edge in other.edges {
+            if !self.edges.iter().any(|e| e.id == edge.id) {
+                self.edges.push(edge);
             }
         }
     }
@@ -77,7 +77,7 @@ impl Matcher {
         })
     }
 
-    /// Fills `osm_way_ids`, `edge_ids` and `match_status`. Errors mean Valhalla itself failed and the incident stays pending.
+    /// Fills `osm_way_ids`, `edges` and `match_status`. Errors mean Valhalla itself failed and the incident stays pending.
     pub fn match_incident(&mut self, inc: &mut Incident) -> Result<()> {
         let key = geo::stable_hash(&serde_json::to_vec(&(&inc.shape, &self.tileset, CACHE_VERSION))?);
         self.used.insert(key);
@@ -94,7 +94,7 @@ impl Matcher {
         match cached.matched {
             Some(m) => {
                 inc.osm_way_ids = m.way_ids;
-                inc.edge_ids = m.edge_ids;
+                inc.edges = m.edges;
                 inc.match_status = MatchStatus::Matched;
             }
             None => inc.match_status = MatchStatus::Failed,
@@ -137,7 +137,7 @@ impl Matcher {
             "shape": line.iter().map(|c| json!({"lat": c[1], "lon": c[0]})).collect::<Vec<_>>(),
             "costing": "auto",
             "shape_match": mode,
-            "filters": {"attributes": ["edge.way_id", "edge.id", "matched.type", "matched.distance_from_trace_point"], "action": "include"},
+            "filters": {"attributes": ["edge.way_id", "edge.id", "edge.speed", "matched.type", "matched.distance_from_trace_point"], "action": "include"},
         });
         let Some(resp) = self.post("trace_attributes", body)? else {
             return Ok(None);
@@ -158,7 +158,7 @@ impl Matcher {
         for e in resp["edges"].as_array().into_iter().flatten() {
             matched.extend(Matched {
                 way_ids: e["way_id"].as_i64().into_iter().collect(),
-                edge_ids: e["id"].as_u64().into_iter().collect(),
+                edges: edge(e["id"].as_u64(), e["speed"].as_u64()).into_iter().collect(),
             });
         }
         Ok(Some(matched).filter(|m| !m.way_ids.is_empty()))
@@ -191,14 +191,18 @@ impl Matcher {
         let Some(resp) = self.post("locate", body)? else {
             return Ok(None);
         };
-        let candidates: Vec<(f64, i64, Option<u64>)> = resp[0]["edges"]
+        let candidates: Vec<(f64, i64, Option<Edge>)> = resp[0]["edges"]
             .as_array()
             .into_iter()
             .flatten()
             .filter_map(|e| {
                 let d = geo::distance(p, [e["correlated_lon"].as_f64()?, e["correlated_lat"].as_f64()?]);
                 let way = e["edge_info"]["way_id"].as_i64()?;
-                Some((d, way, e["edge_id"]["value"].as_u64()))
+                Some((
+                    d,
+                    way,
+                    edge(e["edge_id"]["value"].as_u64(), e["edge"]["speeds"]["default"].as_u64()),
+                ))
             })
             .collect();
         let Some(&(d, way, _)) = candidates.iter().min_by(|a, b| a.0.total_cmp(&b.0)) else {
@@ -209,7 +213,7 @@ impl Matcher {
         }
         Ok(Some(Matched {
             way_ids: vec![way],
-            edge_ids: candidates
+            edges: candidates
                 .iter()
                 .filter(|c| c.1 == way && (c.0 - d).abs() < 1.0)
                 .filter_map(|c| c.2)
@@ -225,4 +229,11 @@ impl Matcher {
             Err(e) => bail!("Valhalla {action}: {e}"),
         }
     }
+}
+
+fn edge(id: Option<u64>, kph: Option<u64>) -> Option<Edge> {
+    Some(Edge {
+        id: id?,
+        kph: u32::try_from(kph?).ok()?,
+    })
 }

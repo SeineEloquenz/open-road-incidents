@@ -36,6 +36,13 @@ impl Shape {
     }
 }
 
+/// A Valhalla directed edge and its usual speed.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct Edge {
+    pub id: u64,
+    pub kph: u32,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum MatchStatus {
@@ -61,9 +68,9 @@ pub struct Incident {
     pub lang: Option<String>,
     pub shape: Shape,
     pub osm_way_ids: Vec<i64>,
-    /// Valhalla directed edge ids, only valid for the tile set they were matched on.
+    /// Valhalla directed edges, only valid for the tile set they were matched on.
     #[serde(skip)]
-    pub edge_ids: Vec<u64>,
+    pub edges: Vec<Edge>,
     pub match_status: MatchStatus,
 }
 
@@ -85,7 +92,7 @@ impl Incident {
             lang: None,
             shape,
             osm_way_ids: Vec::new(),
-            edge_ids: Vec::new(),
+            edges: Vec::new(),
             match_status: MatchStatus::Pending,
         }
     }
