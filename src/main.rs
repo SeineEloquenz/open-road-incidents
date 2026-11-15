@@ -79,6 +79,7 @@ fn run(config: &Config, once: bool) -> Result<()> {
                 }
                 Err(e) => {
                     error!("{}: {e:#}", src.id);
+                    http.forget(&src.url);
                     let stale = state
                         .last_success
                         .is_none_or(|t| (now - t).num_seconds() as u64 > src.stale_secs);
