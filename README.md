@@ -47,15 +47,25 @@ services.open-road-incidents = {
 };
 ```
 
-The graph is built elsewhere and uploaded:
+`build-graph` keeps Geofabrik extracts current with daily diffs, keeps only roads, ferries and turn restrictions, and rebuilds only when an extract changed. Finished files land in `DIR/ready`. `CONCURRENCY` limits build threads, which lowers memory use, and `FORCE=1` rebuilds unchanged extracts.
+
+With `graph.enable` the server does this itself on a schedule, monthly by default, at low priority, and swaps the new graph in:
+
+```nix
+services.open-road-incidents.graph = {
+  enable = true;
+  concurrency = 2;
+  memoryMax = "8G";
+};
+```
+
+On a machine too small to build, build elsewhere and upload:
 
 ```sh
 nix run .#build-graph -- graph                     # the covered countries, or pass regions like europe/luxembourg
-rsync graph/work/{valhalla_tiles,traffic}.tar server:/var/lib/open-road-incidents/valhalla/incoming/
+rsync graph/ready/{valhalla_tiles,traffic}.tar server:/var/lib/open-road-incidents/valhalla/incoming/
 ssh server systemctl restart valhalla              # swaps in the new graph and restarts the collector
 ```
-
-`CONCURRENCY` limits build threads, which lowers memory use.
 
 ## Output
 

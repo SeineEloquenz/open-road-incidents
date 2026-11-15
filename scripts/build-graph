@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Builds the Valhalla routing graph and an empty live traffic extract for Geofabrik regions.
-# Usage: build-graph OUT_DIR [REGION...], regions like europe/luxembourg.
+# Keeps Geofabrik extracts current and builds the Valhalla routing graph and an empty live traffic extract from their roads.
+# Usage: build-graph DIR [REGION...], regions like europe/luxembourg.
+# The finished files land in DIR/ready only when an extract changed since the last build, or always with FORCE=1.
 set -euo pipefail
 
-out=${1:?usage: build-graph OUT_DIR [REGION...]}
+dir=${1:?usage: build-graph DIR [REGION...]}
 shift
 regions=("$@")
 if [ ${#regions[@]} -eq 0 ]; then
@@ -11,25 +12,63 @@ if [ ${#regions[@]} -eq 0 ]; then
 fi
 concurrency=${CONCURRENCY:-$(($(nproc) / 2))}
 
-mkdir -p "$out/pbf" "$out/work"
-out=$(cd "$out" && pwd)
-pbfs=()
+mkdir -p "$dir/pbf" "$dir/work" "$dir/ready"
+dir=$(cd "$dir" && pwd)
+
+download() {
+  curl -fsSL -A "OpenRoadIncidents/0.1" -o "$1.part" "https://download.geofabrik.de/$2-latest.osm.pbf"
+  mv "$1.part" "$1"
+}
+
+replication() {
+  local timestamp
+  timestamp=$(osmium fileinfo -g header.option.osmosis_replication_timestamp "$1" 2>/dev/null || true)
+  if [ -n "$timestamp" ]; then echo "$timestamp"; else stat -c %Y "$1"; fi
+}
+
+roads=()
+inputs=""
 for region in "${regions[@]}"; do
-  file="$out/pbf/${region//\//_}.osm.pbf"
-  curl -fsSL -A "OpenRoadIncidents/0.1" -z "$file" -o "$file" "https://download.geofabrik.de/$region-latest.osm.pbf"
-  pbfs+=("$file")
+  name=${region//\//_}
+  raw="$dir/pbf/$name.osm.pbf"
+  filtered="$dir/pbf/$name.roads.osm.pbf"
+  if [ -f "$raw" ]; then
+    status=1
+    while [ "$status" -eq 1 ]; do
+      status=0
+      pyosmium-up-to-date --size 256 --tmpdir "$dir/work" "$raw" || status=$?
+    done
+    [ "$status" -eq 0 ] || download "$raw" "$region"
+  else
+    download "$raw" "$region"
+  fi
+  version=$(replication "$raw")
+  if [ ! -f "$filtered" ] || [ "$(cat "$filtered.version" 2>/dev/null)" != "$version" ]; then
+    # Valhalla reads only roads, paths, ferries and turn restrictions. Nodes of kept ways stay, with their barrier and signal tags.
+    osmium tags-filter --overwrite -o "$filtered" "$raw" w/highway w/route=ferry r/type=restriction
+    echo "$version" >"$filtered.version"
+  fi
+  roads+=("$filtered")
+  inputs+="$name=$version "
 done
 
-rm -rf "$out/work/tiles"
-config="$out/work/valhalla.json"
+if [ "${FORCE:-0}" != 1 ] && [ "$(cat "$dir/work/built" 2>/dev/null)" = "$inputs" ]; then
+  echo "Extracts unchanged since the last build"
+  exit 0
+fi
+
+rm -rf "$dir/work/tiles"
+config="$dir/work/valhalla.json"
 valhalla_build_config \
-  --mjolnir-tile-dir "$out/work/tiles" \
-  --mjolnir-tile-extract "$out/work/valhalla_tiles.tar" \
-  --mjolnir-traffic-extract "$out/work/traffic.tar" \
+  --mjolnir-tile-dir "$dir/work/tiles" \
+  --mjolnir-tile-extract "$dir/work/valhalla_tiles.tar" \
+  --mjolnir-traffic-extract "$dir/work/traffic.tar" \
   --mjolnir-concurrency "$concurrency" \
   --mjolnir-admin "" \
   --mjolnir-timezone "" >"$config"
-valhalla_build_tiles -c "$config" "${pbfs[@]}"
+valhalla_build_tiles -c "$config" "${roads[@]}"
 valhalla_build_extract -c "$config" -t -O
-rm -rf "$out/work/tiles"
-echo "Built $out/work/valhalla_tiles.tar and $out/work/traffic.tar"
+rm -rf "$dir/work/tiles"
+mv "$dir/work/valhalla_tiles.tar" "$dir/work/traffic.tar" "$dir/ready/"
+echo "$inputs" >"$dir/work/built"
+echo "Built $dir/ready/valhalla_tiles.tar and $dir/ready/traffic.tar"

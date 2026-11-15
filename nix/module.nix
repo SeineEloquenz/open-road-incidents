@@ -68,6 +68,43 @@ in
       };
     };
 
+    graph = {
+      enable = lib.mkEnableOption "keeping OSM extracts current and rebuilding the routing graph on this machine";
+      package = lib.mkOption {
+        type = lib.types.package;
+        description = "The build-graph script.";
+      };
+      regions = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [
+          "europe/finland"
+          "europe/france"
+          "europe/luxembourg"
+          "europe/netherlands"
+          "europe/belgium"
+          "europe/spain"
+          "europe/germany"
+        ];
+        description = "Geofabrik regions the graph covers.";
+      };
+      schedule = lib.mkOption {
+        type = lib.types.str;
+        default = "monthly";
+        description = "When to update the extracts and rebuild, as a systemd calendar expression. Unchanged extracts skip the build.";
+      };
+      concurrency = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 2;
+        description = "Build threads. Fewer threads need less memory.";
+      };
+      memoryMax = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "8G";
+        description = "Memory limit for the build.";
+      };
+    };
+
     virtualHost = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
@@ -93,6 +130,7 @@ in
       ${dataDir}.d = { user = "open-road-incidents"; group = "open-road-incidents"; mode = "0755"; };
       ${graphDir}.d = { user = "open-road-incidents"; group = "open-road-incidents"; mode = "0755"; };
       "${graphDir}/incoming".d = { user = "open-road-incidents"; group = "open-road-incidents"; mode = "0755"; };
+      "${dataDir}/graph".d = { user = "open-road-incidents"; group = "open-road-incidents"; mode = "0755"; };
     };
 
     systemd.services.valhalla = {
@@ -143,6 +181,46 @@ in
         ProtectHome = true;
         PrivateTmp = true;
         ReadWritePaths = [ dataDir ];
+      };
+    };
+
+    systemd.services.open-road-incidents-graph = lib.mkIf cfg.graph.enable {
+      description = "Update OSM extracts and rebuild the Valhalla graph";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      environment.CONCURRENCY = toString cfg.graph.concurrency;
+      serviceConfig = {
+        Type = "oneshot";
+        User = "open-road-incidents";
+        Group = "open-road-incidents";
+        ExecStart = "${lib.getExe cfg.graph.package} ${dataDir}/graph ${lib.escapeShellArgs cfg.graph.regions}";
+        ExecStartPost = "+" + pkgs.writeShellScript "open-road-incidents-graph-install" ''
+          ready=${dataDir}/graph/ready
+          if [ -f $ready/valhalla_tiles.tar ] && [ -f $ready/traffic.tar ]; then
+            mv $ready/valhalla_tiles.tar $ready/traffic.tar ${graphDir}/incoming/
+            systemctl restart valhalla.service
+          fi
+        '';
+        TimeoutStartSec = "infinity";
+        Nice = 19;
+        CPUSchedulingPolicy = "batch";
+        IOSchedulingClass = "idle";
+        MemoryMax = lib.mkIf (cfg.graph.memoryMax != null) cfg.graph.memoryMax;
+        NoNewPrivileges = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        PrivateTmp = true;
+        ReadWritePaths = [ dataDir ];
+      };
+    };
+
+    systemd.timers.open-road-incidents-graph = lib.mkIf cfg.graph.enable {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = cfg.graph.schedule;
+        OnBootSec = "15min";
+        Persistent = true;
+        RandomizedDelaySec = "1h";
       };
     };
 

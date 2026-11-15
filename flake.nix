@@ -12,7 +12,7 @@
         valhalla = pkgs.callPackage ./nix/valhalla.nix { };
         build-graph = pkgs.writeShellApplication {
           name = "build-graph";
-          runtimeInputs = [ valhalla pkgs.curl pkgs.coreutils ];
+          runtimeInputs = [ valhalla pkgs.curl pkgs.coreutils pkgs.osmium-tool pkgs.python3Packages.osmium ];
           text = builtins.readFile ./scripts/build-graph;
         };
       });
@@ -25,6 +25,7 @@
           imports = [ ./nix/module.nix ];
           services.open-road-incidents.package = lib.mkDefault packages.open-road-incidents;
           services.open-road-incidents.valhalla.package = lib.mkDefault packages.valhalla;
+          services.open-road-incidents.graph.package = lib.mkDefault packages.build-graph;
         };
 
       checks = forAll (pkgs: {
@@ -39,6 +40,7 @@
               services.open-road-incidents = {
                 enable = true;
                 virtualHost = "roads.example.org";
+                graph.enable = true;
               };
             }
           ];
