@@ -132,7 +132,8 @@ fn tiles(root: &Path, collection: &Value) -> Result<()> {
             "-l",
             "incidents",
             "-Z6",
-            "-z12",
+            "-z14",
+            "--simplify-only-low-zooms",
             "-r1",
             "-e",
         ])

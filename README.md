@@ -63,7 +63,7 @@ Everything is written to `out/v1/`, ready for static hosting.
 |---|---|
 | `{cc}.geojson` | All current and planned incidents for a country |
 | `avoid/{cc}.json` | Matched road closures as OSM way IDs, for routers |
-| `tiles/{z}/{x}/{y}.pbf` | Vector tiles for zoom 6 to 12, layer `incidents` |
+| `tiles/{z}/{x}/{y}.pbf` | Vector tiles for zoom 6 to 14, layer `incidents`, unsimplified at zoom 14 |
 | `sources.json` | Licence, attribution and freshness per source |
 
 Geometry always comes from the source, never from OSM. When a feed only gives start and end points the line between them is straight and `geometry_exact` is false. Clients must show the attribution of each source.
