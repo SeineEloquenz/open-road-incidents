@@ -70,6 +70,9 @@ pub struct Incident {
     /// Affects both directions of the road although its line runs along one.
     #[serde(default)]
     pub both_directions: bool,
+    /// Shown on the map but left out of routing.
+    #[serde(default)]
+    pub map_only: bool,
     pub osm_way_ids: Vec<i64>,
     /// Valhalla directed edges, only valid for the tile set they were matched on.
     #[serde(skip)]
@@ -95,6 +98,7 @@ impl Incident {
             lang: None,
             shape,
             both_directions: false,
+            map_only: false,
             osm_way_ids: Vec::new(),
             edges: Vec::new(),
             match_status: MatchStatus::Pending,

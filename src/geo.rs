@@ -23,6 +23,31 @@ pub fn from_utm33(x: f64, y: f64) -> Result<Coord> {
     to_wgs84(PROJS.get_or_init(|| projections(UTM33)), x, y)
 }
 
+const UTM32: &str = "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+const ISN93: &str = "+proj=lcc +lat_0=65 +lon_0=-19 +lat_1=64.25 +lat_2=65.75 +x_0=500000 +y_0=500000 \
+    +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+const LAMBERT2008: &str = "+proj=lcc +lat_0=50.797815 +lon_0=4.35921583333333 +lat_1=49.8333333333333 \
+    +lat_2=51.1666666666667 +x_0=649328 +y_0=665262 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+const WEB_MERCATOR: &str = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +no_defs";
+
+/// Coordinates in one of the reference systems sources use, by EPSG code, to WGS84.
+pub fn from_epsg(code: u32, x: f64, y: f64) -> Result<Coord> {
+    static UTM32_PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
+    static ISN93_PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
+    static MERCATOR_PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
+    static LAMBERT2008_PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
+    match code {
+        4326 => Ok([x, y]),
+        25832 => to_wgs84(UTM32_PROJS.get_or_init(|| projections(UTM32)), x, y),
+        25833 => from_utm33(x, y),
+        31370 => from_lambert72(x, y),
+        3812 => to_wgs84(LAMBERT2008_PROJS.get_or_init(|| projections(LAMBERT2008)), x, y),
+        3057 => to_wgs84(ISN93_PROJS.get_or_init(|| projections(ISN93)), x, y),
+        3857 => to_wgs84(MERCATOR_PROJS.get_or_init(|| projections(WEB_MERCATOR)), x, y),
+        _ => Err(anyhow!("unsupported reference system EPSG:{code}")),
+    }
+}
+
 fn projections(source: &str) -> (Proj, Proj) {
     (
         Proj::from_proj_string(source).expect("valid projection definition"),

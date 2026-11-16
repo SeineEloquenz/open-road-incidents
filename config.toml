@@ -97,3 +97,591 @@ url = "http://www.gencat.cat/transit/opendata/incidenciesGML.xml"
 poll_secs = 300
 licence = "unconfirmed"
 attribution = "Servei Català de Trànsit"
+
+[[source]]
+id = "de-be-berlin"
+country = "DE"
+format = "geojson"
+url = "https://api.viz.berlin.de/daten/baustellen_sperrungen_viz.json"
+poll_secs = 600
+licence = "DL-DE-BY-2.0"
+attribution = "Verkehrsinformationszentrale Berlin (VIZ)"
+
+[source.geojson]
+id_fields = ["id"]
+type_field = "subtype"
+type_map = { "Baustelle" = "roadworks", "Bauarbeiten" = "roadworks", "Sperrung" = "closure", "Störung" = "obstruction", "Gefahr" = "obstruction" }
+default_type = "other"
+severity_field = "severity"
+closed_values = ["Vollsperrung"]
+restricted_values = ["Fahrtrichtungssperrung"]
+headline_field = "content"
+description_field = "section"
+road_field = "street"
+valid_from_field = "validity.from"
+valid_to_field = "validity.to"
+lang = "de"
+
+[[source]]
+id = "de-nw-aachen"
+country = "DE"
+format = "geojson"
+url = "https://bsis.aachen.de/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=BSIS:PUNKTE_ALLE&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Stadt Aachen"
+
+[source.geojson]
+id_fields = ["sdatenid"]
+type_field = "art"
+type_map = { "Strassenbau" = "roadworks", "Autokran+Arbeitsbühne" = "roadworks", "Bauzaun" = "roadworks", "Baumateriallagerung" = "roadworks", "Container über 10 cbm" = "roadworks", "Absperrung einer Fläche" = "roadworks", "Begrünung" = "roadworks", "Beschilderung+Markierung" = "roadworks", "Elektrotankstellen" = "roadworks" }
+default_type = "roadworks"
+severity_field = "symbol"
+closed_values = ["Vollsperrung - aktuell", "Vollsperrung - zukünftig"]
+restricted_values = ["Teilsperrung - aktuell", "Teilsperrung - zukünftig", "starke Verkehrsbehinderung - aktuell", "starke Verkehrsbehinderung - zukünftig"]
+headline_field = "name"
+description_field = "einschraen"
+road_field = "strassen"
+valid_from_field = "von"
+valid_to_field = "bis"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "symbol"
+exclude = ["Vollsperrung - abgelaufen", "Teilsperrung - abgelaufen", "starke Verkehrsbehinderung - abgelaufen", "Verkehrsbehinderung - abgelaufen"]
+
+[[source]]
+id = "de-bw-freiburg"
+country = "DE"
+format = "geojson"
+url = "https://geoportal.freiburg.de/wfs/gut_baustellen/gut_baustellen?service=WFS&version=2.0.0&request=GetFeature&typeNames=baustellenumgriffe&outputFormat=GEOJSON&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Datengrundlage: Stadt Freiburg, www.freiburg.de"
+
+[source.geojson]
+id_fields = ["fid"]
+default_type = "roadworks"
+headline_field = "name"
+description_field = "verkehrshinweis"
+valid_from_field = "zeitraum_von"
+valid_to_field = "zeitraum_bis"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "bauherr"
+exclude = ["Autobahn GmbH"]
+
+[[source]]
+id = "de-bw-stuttgart"
+country = "DE"
+format = "geojson"
+url = "https://geoserver.stuttgart.de/gdc/Verkehr_Mobilitaet/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=Verkehr_Mobilitaet:A66_BAUM_BAUSTELLEN_DATE_WEB_im_Bau_EPSG25832&outputFormat=application/json"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Landeshauptstadt Stuttgart"
+
+[source.geojson]
+extra_urls = ["https://geoserver.stuttgart.de/gdc/Verkehr_Mobilitaet/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=Verkehr_Mobilitaet:A66_BAUM_BAUSTELLEN_DATE_WEB_geplant_EPSG25832&outputFormat=application/json"]
+crs = 25832
+id_fields = ["STRASSENNAME", "DETAILS_STANDORT", "ART_ARBEIT", "KOORDINATE_X", "KOORDINATE_Y"]
+default_type = "roadworks"
+headline_field = "ART_ARBEIT"
+description_field = "VERKEHRSAUSWIRKUNG"
+road_field = "STRASSENNAME"
+valid_from_field = "ANFANG"
+valid_to_field = "ENDE"
+lang = "de"
+
+[[source]]
+id = "de-bw-trk"
+country = "DE"
+format = "geojson"
+url = "https://mobil.trk.de/geoserver/TBA/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=TBA:baustellen_aktuell&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Stadt Karlsruhe / TechnologieRegion Karlsruhe (Mobilitätsportal), mit Daten der Städte Karlsruhe, Bruchsal, Rheinstetten, Stutensee, Rastatt, Baden-Baden und Ettlingen"
+
+[source.geojson]
+extra_urls = ["https://mobil.trk.de/geoserver/TBA/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=TBA:baustellen_vorschau&outputFormat=application/json&srsName=EPSG:4326"]
+id_fields = ["id"]
+type_field = "art"
+type_map = { "Bauliche Sondernutzung" = "roadworks", "Strom bzw. TK-Versorgung" = "roadworks", "Gas bzw. Wasserversorgung" = "roadworks", "Fernwärmeversorgung" = "roadworks", "Kanalbau" = "roadworks", "Gleisbau" = "roadworks", "Straßenbau" = "roadworks", "Haltestellenumbau mit Straßenumgestaltung" = "roadworks", "Stützwand" = "roadworks", "Tunnelbau" = "roadworks", "Straßenunterhaltung" = "roadworks", "Tunnelwartung" = "roadworks", "Brückenbau" = "roadworks", "Abbruch/Rückbau" = "roadworks", "Baugrunduntersuchung" = "roadworks", "Grünpflegearbeiten" = "roadworks", "Kraneinsatz" = "roadworks", "geänderte Verkehrsführung im Zuge von Baumaßnahmen" = "roadworks" }
+default_type = "roadworks"
+severity_field = "sperrung"
+closed_values = ["mit Vollsperrung"]
+restricted_values = ["mit Sperrung in eine Fahrtrichtung"]
+headline_field = "lage"
+description_field = "zusatzinfo"
+valid_from_field = "vorgangszeitraum_von"
+valid_to_field = "vorgangszeitraum_bis"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "datenquelle"
+exclude = ["Collectivité européenne d’Alsace"]
+
+[[source.geojson.filters]]
+field = "sperrung"
+exclude = ["keine Verkehrsbehinderung"]
+
+[[source]]
+id = "de-by-ingolstadt"
+country = "DE"
+format = "geojson"
+url = "https://www.ingolstadt.de/openbydata/VMS/Baustellen_14_Tage_Ingolstadt.geojson"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Stadt Ingolstadt"
+
+[source.geojson]
+crs = 25832
+id_fields = ["AKZ"]
+type_field = "VORGNAME"
+type_map = { "Baustellen" = "roadworks", "Sondernutzung allgemein" = "roadworks" }
+default_type = "roadworks"
+severity_field = "SPERR_ART"
+closed_values = ["13", "23"]
+restricted_values = ["12", "22"]
+headline_field = "ART_ARB"
+description_field = "ART_VB"
+road_field = "STRASSE"
+valid_from_field = "BEGINN"
+valid_to_field = "ENDE"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "SPERR_ART"
+exclude = ["0"]
+
+[[source]]
+id = "de-by-muenchen"
+country = "DE"
+format = "geojson"
+url = "https://geoportal.muenchen.de/geoserver/mor_wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=mor_wfs:baustellen_opendata&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Landeshauptstadt München – opendata.muenchen.de"
+# Munich's roadworks say nothing about lanes or closures, so they only show on the map.
+routing = false
+
+[source.geojson]
+id_fields = ["fachliche_id", "strasse_hausnr", "betroffene_bereiche", "beschreibung", "beeintraechtigung", "beginn_datum_kombiniert", "ende_datum_kombiniert"]
+type_field = "art"
+type_map = { "Baumaßnahme" = "roadworks" }
+default_type = "roadworks"
+headline_field = "beschreibung"
+description_field = "beeintraechtigung"
+road_field = "strasse_hausnr"
+valid_from_field = "beginn_datum_kombiniert"
+valid_to_field = "ende_datum_kombiniert"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "art"
+exclude = ["Vorübergehendes Haltverbot"]
+
+[[source.geojson.filters]]
+field = "betroffene_bereiche"
+exclude = ["Parkbucht", "Begleitgrün", "Begleitgrün,Parkbucht", "Parkbucht,Begleitgrün", "Parkbucht;Begleitgrün", "Haltverbot", "Halteverbot", "Halteverbot auf Gebäudelänge"]
+
+[[source]]
+id = "de-he-frankfurt"
+country = "DE"
+format = "geojson"
+url = "https://geowebdienste.frankfurt.de/Baustellen?service=WFS&version=2.0.0&request=GetFeature&typeNames=opendata_verkehr:Baustellen&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Stadt Frankfurt am Main, www.frankfurt.de"
+
+[source.geojson]
+id_fields = ["baustellennummer", "name"]
+type_field = "meldung"
+type_map = { "Baustelle" = "roadworks", "Wanderbaustelle" = "roadworks" }
+default_type = "roadworks"
+severity_field = "sperrung"
+closed_values = ["1"]
+restricted_values = ["0"]
+headline_field = "name"
+description_field = "textlong"
+road_field = "name"
+valid_from_field = "startevent"
+valid_to_field = "endevent"
+lang = "de"
+
+[[source]]
+id = "de-he-kassel"
+country = "DE"
+format = "geojson"
+url = "https://vms.kassel.de/geoserver/vtinfo/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=vtinfo:Ereignisse&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 900
+licence = "DL-DE-BY-2.0"
+attribution = "Stadt Kassel, Straßenverkehrs- und Tiefbauamt"
+
+[source.geojson]
+extra_urls = ["https://vms.kassel.de/geoserver/vtinfo/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=vtinfo:Ereignissegeplant&outputFormat=application/json&srsName=EPSG:4326"]
+id_fields = ["messageid"]
+default_type = "roadworks"
+severity_field = "art"
+closed_values = ["12", "22"]
+restricted_values = ["13"]
+headline_field = "name"
+description_field = "textshort"
+road_field = "name"
+valid_from_field = "startevent"
+valid_to_field = "endevent"
+lang = "de"
+
+[[source]]
+id = "de-mv-rostock"
+country = "DE"
+format = "geojson"
+url = "https://geo.sv.rostock.de/download/opendata/baustellen/baustellen.json"
+poll_secs = 1800
+licence = "CC0-1.0"
+attribution = "Hanse- und Universitätsstadt Rostock"
+
+[source.geojson]
+id_fields = ["uuid"]
+type_field = "sparte"
+type_map = { "Straßenbau" = "roadworks", "Gleisbau" = "roadworks", "Fernwärmeleitung" = "roadworks", "Wasserleitung" = "roadworks", "Abwasserleitung" = "roadworks", "Gasleitung" = "roadworks", "Stromnetz" = "roadworks", "Kabelnetz" = "roadworks", "Telefonnetz" = "roadworks", "Straßenbeleuchtung" = "roadworks", "Lichtsignalanlage" = "roadworks", "Gebäudesanierung" = "roadworks", "Hochbau" = "roadworks", "Kranarbeiten" = "roadworks", "Schwerlasttransport" = "roadworks", "privat" = "roadworks", "Sport" = "other" }
+default_type = "roadworks"
+severity_field = "verkehrsbeeintraechtigungen"
+closed_values = ["Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Vollsperrung", "Sicherungsmaßnahmen entlang der Straße, Vollsperrung", "Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich, Vollsperrung", "Sicherungsmaßnahmen entlang der Straße, Verkehrsraumeinschränkungen, Vollsperrung", "Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Verkehrsraumeinschränkungen, Vollsperrung", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Vollsperrung", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich, Sperrung für Fahrradverkehr, Verkehrsraumeinschränkungen, Vollsperrung", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich, Vollsperrung"]
+restricted_values = ["halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Verkehrsraumeinschränkungen", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich", "halbseitige Sperrung, Sicherungsmaßnahmen entlang der Straße, Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich, Verkehrsraumeinschränkungen"]
+headline_field = "baumassnahme"
+description_field = "verkehrsbeeintraechtigungen"
+road_field = "strasse_name"
+valid_from_field = "baubeginn"
+valid_to_field = "bauende"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "sparte"
+exclude = ["sonstige temporäre Beschilderung"]
+
+[[source.geojson.filters]]
+field = "verkehrsbeeintraechtigungen"
+exclude = ["Sicherungsmaßnahmen entlang des Gehwegs", "Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich, Sperrung für Fahrradverkehr", "Sicherungsmaßnahmen entlang des Gehwegs, Sperrung des Fußgängerverkehrs im Gehwegbereich"]
+
+[[source]]
+id = "de-nw-bochum"
+country = "DE"
+format = "geojson"
+url = "https://geoservicekkm.bochum.de/arcgis/rest/services/maponline/Baustellen/MapServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+poll_secs = 1800
+licence = "CC0-1.0"
+attribution = "Stadt Bochum"
+
+[source.geojson]
+id_fields = ["NUMSTR", "X", "Y"]
+default_type = "roadworks"
+severity_field = "BEEINTRAEC"
+closed_values = ["Vollsperrung Fahrbahn", "Vollsperrung Fahrbahn, Vollsperrung Gehweg", "Vollsperrung Fahrbahn, Beeinträchtigung ÖPNV, Vollsperrung Gehweg", "Vollsperrung Fahrbahn,  Relevant für Pressefilter", "Vollsperrung Fahrbahn, Vollsperrung Radweg, Vollsperrung Gehweg", "Vollsperrung Fahrbahn, Einsatz Lichtsignalanlage, Halbseitige Sperrung Fahrbahn", "Vollsperrung Fahrbahn, teilweise Sperrung Gehweg"]
+restricted_values = ["Einbahnstraße", "Einsatz Lichtsignalanlage", "Einsatz Lichtsignalanlage, Beschränkung auf 30 km/h", "Einsatz Lichtsignalanlage, Halbseitige Sperrung Fahrbahn", "Verengung 2 auf 1", "Einsatz Lichtsignalanlage, Vollsperrung Gehweg", "Einsatz Lichtsignalanlage, teilweise Sperrung Fahrbahn", "Einbahnstraße, teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "Einbahnstraße, teilweise Sperrung Gehweg", "Einsatz Lichtsignalanlage, Beschränkung auf 30 km/h, Halbseitige Sperrung Fahrbahn, Spurverlegung", "Einsatz Lichtsignalanlage, Verengung 2 auf 1, Beschränkung auf 30 km/h", "Einsatz Lichtsignalanlage, Verengung 2 auf 1, Beschränkung auf 30 km/h, Vollsperrung Gehweg", "Halbseitige Sperrung Fahrbahn, Vollsperrung Gehweg", "Verengung 2 auf 1, Halbseitige Sperrung Fahrbahn, Vollsperrung Gehweg, Restfahrbahnbreite 3,0m i.L.", "Beeinträchtigung ÖPNV, teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "Beeinträchtigung ÖPNV, teilweise Sperrung Fahrbahn, teilweise Sperrung Gehweg", "Beschränkung auf 30 km/h, teilweise Sperrung Fahrbahn", "Einbahnstraße, Einsatz Lichtsignalanlage, teilweise Sperrung Fahrbahn", "Einbahnstraße, Halbseitige Sperrung Fahrbahn", "Einbahnstraße, Halbseitige Sperrung Fahrbahn, teilweise Sperrung Gehweg", "Einbahnstraße, Verengung 2 auf 1, Beschränkung auf 30 km/h", "Einbahnstraße, Vollsperrung Gehweg", "Einsatz Lichtsignalanlage, Halbseitige Sperrung Fahrbahn, Restfahrbahnbreite 3,0m i.L.", "Einsatz Lichtsignalanlage, Halbseitige Sperrung Fahrbahn, Vollsperrung Gehweg", "Einsatz Lichtsignalanlage, Halbseitige Sperrung Fahrbahn, Vollsperrung Radweg, Vollsperrung Gehweg", "Einsatz Lichtsignalanlage, teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "Einsatz Lichtsignalanlage, teilweise Sperrung Gehweg", "Halbseitige Sperrung Fahrbahn", "Halbseitige Sperrung Fahrbahn, Fußgänger auf Fahrbahn", "Halbseitige Sperrung Fahrbahn, Vollsperrung Gehweg, Restfahrbahnbreite 3,0m i.L.", "Halbseitige Sperrung Fahrbahn, teilweise Sperrung Gehweg", "Spurverlegung, teilweise Sperrung Fahrbahn", "Verengung 2 auf 1, Beschränkung auf 30 km/h", "Verengung 2 auf 1, Beschränkung auf 30 km/h, Vollsperrung Radweg, Vollsperrung Gehweg, Fußgänger auf Fahrbahn", "Verengung 2 auf 1, Halbseitige Sperrung Fahrbahn, Spurverlegung", "Verengung 2 auf 1, Verengung 3 auf 2, teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "Verengung 2 auf 1, Vollsperrung Gehweg", "Verengung 2 auf 1, Vollsperrung Radweg, Vollsperrung Gehweg", "Verengung 2 auf 1, teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "Vollsperrung einer Richtungsfahrbahn, Spurverlegung", "Vollsperrung einer Richtungsfahrbahn, Verengung 2 auf 1, Beschränkung auf 30 km/h, Spurverlegung", "teilweise Sperrung Fahrbahn", "teilweise Sperrung Fahrbahn, Vollsperrung Gehweg", "teilweise Sperrung Fahrbahn, Vollsperrung Gehweg, teilweise Sperrung Gehweg"]
+headline_field = "MERKMAL"
+description_field = "BEEINTRAEC"
+road_field = "STANDORT"
+valid_from_field = "DATUMVON"
+valid_to_field = "DATUMBIS"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "BEEINTRAEC"
+exclude = ["teilweise Sperrung Gehweg", "Vollsperrung Gehweg", " Relevant für Pressefilter, Vollsperrung Radweg"]
+
+[[source]]
+id = "de-nw-dortmund"
+country = "DE"
+format = "geojson"
+url = "https://open-data.dortmund.de/api/v2/catalog/datasets/fb66-baustellen-tagesaktuell-flachen/exports/geojson"
+poll_secs = 1800
+licence = "DL-DE-ZERO-2.0"
+attribution = "Stadt Dortmund, Tiefbauamt"
+
+[source.geojson]
+extra_urls = ["https://open-data.dortmund.de/api/v2/catalog/datasets/fb66-baustellen-geplant-flachen/exports/geojson"]
+id_fields = ["art_der_baumassnahme", "von", "bis"]
+default_type = "roadworks"
+severity_field = "art_der_baumassnahme"
+closed_pattern = "\\bVollsperr|\\bVollsperung|\\bVSP\\b"
+closed_exception_pattern = "\\bVollsperrung\\s+Fu"
+restricted_pattern = "(?:halbs|halbseit|Teilsperr|Einbahn|Spureinzug|Abbiegespur|\\bLSA\\b|Wanderbaustelle)"
+headline_field = "art_der_baumassnahme"
+description_field = "auftraggeber"
+valid_from_field = "von"
+valid_to_field = "bis"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "art_der_baumassnahme"
+exclude_pattern = "//\\s*(?:teilweise\\s+)?gehwegsp[a-zä.]*(?:\\s+teilw\\.?)?\\s*$"
+
+[[source]]
+id = "de-nw-duisburg"
+country = "DE"
+format = "geojson"
+url = "https://geoportal2.duisburg.de/arcgisserver/rest/services/Masterportal/MP_Verkehrsportal/MapServer/3/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+poll_secs = 1800
+licence = "CC-BY-3.0-DE"
+attribution = "Stadt Duisburg"
+
+[source.geojson]
+id_fields = ["OBJECTID"]
+default_type = "roadworks"
+severity_field = "SYMBOL_ID"
+closed_values = ["2"]
+restricted_values = ["4"]
+headline_field = "ANLASS_TXT_BM"
+description_field = "BESCHREIBUNG"
+road_field = "BEZEICHNUNG_BM"
+validity_range_field = "BAUZEIT_AB"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "AKTIV"
+include = ["1"]
+
+[[source]]
+id = "de-nw-herne"
+country = "DE"
+format = "geojson"
+url = "https://geodaten.herne.de/geoserver/verkehr/baustellen?SERVICE=WFS&REQUEST=GetFeature&TYPENAME=baustelle&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-ZERO-2.0"
+attribution = "Stadt Herne"
+
+[source.geojson]
+id_fields = ["strasse", "massnahme", "beginn"]
+default_type = "roadworks"
+severity_field = "einschr"
+closed_values = ["Vollsperrung", "Vollsperrung Fahrbahn", "Vollsperrung Fahrbahn/Gehweg", "Teil/Vollsperrung Fahrbahn, Einbahnreglung", "Teil/Vollsperrung Fahrbahn, LSA, Einbahnreglung", "Teil/Vollsperrung, Einbahnreglung, mit LSA"]
+restricted_values = ["Teilsperrung mit LSA", "Teilsperrung Fahrbahn mit LSA", "Teilsperrung Fahrbahn mit Einbahnreglung", "Teilsperrung Fahrbahn mit einabhnreglung", "Baustellen LSA"]
+headline_field = "massnahme"
+description_field = "einschr"
+road_field = "strasse"
+valid_from_field = "beginn"
+valid_to_field = "ende"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "einschr"
+exclude = ["Vollsperrung Gehweg", "Vollsperrung Gehweg "]
+
+[[source]]
+id = "de-rp-lbm"
+country = "DE"
+format = "geojson"
+url = "https://maps.mobilitaetsatlas.de/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=mwvlw:baustelle&outputFormat=application/json&srsName=EPSG:4326&CQL_FILTER=quelle%3D%27Verkehrsbeh%C3%B6rden%20in%20Rheinland-Pfalz%27"
+poll_secs = 900
+licence = "DL-DE-BY-2.0"
+attribution = "Landesbetrieb Mobilität Rheinland-Pfalz / Mobilitätsatlas Rheinland-Pfalz"
+
+[source.geojson]
+default_type = "roadworks"
+severity_field = "art_der_arbeiten"
+closed_values = ["Vollsperrung"]
+restricted_values = ["Halbseitige Sperrungen", "Sperrung einer Fahrtrichtung", "Sperrung für LKW"]
+headline_field = "art_der_arbeiten"
+description_field = "beschreibung"
+road_field = "strasse"
+valid_from_field = "von"
+valid_to_field = "bis"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "quelle"
+include = ["Verkehrsbehörden in Rheinland-Pfalz"]
+
+[[source]]
+id = "de-sh-kiel"
+country = "DE"
+format = "geojson"
+url = "https://ims.kiel.de/geodatenextern/services/Stadtplan/LHKielWmsWfs/MapServer/WFSServer?request=GetFeature&service=WFS&typeName=Baustellen&outputFormat=geoJSON"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Landeshauptstadt Kiel, Amt für Bauordnung, Vermessung und Geoinformation"
+
+[source.geojson]
+id_fields = ["BaustelleID"]
+default_type = "roadworks"
+severity_field = "Legende"
+closed_values = ["Voll_Aktuell", "Voll_Zukunft"]
+headline_field = "Grund"
+description_field = "Auswirkung"
+road_field = "Strasse"
+valid_from_field = "Von"
+valid_to_field = "Bis"
+null_values = ["null"]
+lang = "de"
+
+[[source.geojson.filters]]
+field = "Auswirkung"
+exclude = ["Sperrung Parkplätze", "Sperrung Parplätze", "Sperrung Parkplatz", "Teilweise Sperrung Parkplatz", "Sperrung von Behindertenparkplätzen", "Wegfall Parkplätze auf dem Seitenstreifen"]
+
+[[source]]
+id = "de-sn-chemnitz"
+country = "DE"
+format = "geojson"
+url = "https://services6.arcgis.com/jiszdsDupTUO3fSM/arcgis/rest/services/Baustellen_Buergerauskunft/FeatureServer/1/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Stadt Chemnitz"
+
+[source.geojson]
+id_fields = ["AKZ", "STRASSE"]
+default_type = "roadworks"
+severity_field = "SPUR"
+closed_values = ["Vollsperrung"]
+headline_field = "GRUND"
+description_field = "SPERRUNG"
+road_field = "STRASSE"
+valid_from_field = "DATUM_VON"
+valid_to_field = "DATUM_BIS"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "GRUND"
+exclude = ["Umzug  -  mit Möbelfahrzeug (ohne Einsatz Möbellift)", "Umzug  -  mit Möbelfahrzeug einschl. Möbellift", "Umzug  -   -  mit Möbelfahrzeug einschl. Möbellift", "Umzug  -  mit Möbelfahrzeug 1.) einschl. Möbellift/ 2.) ohne Möbellift"]
+
+[[source.geojson.filters]]
+field = "SPERRUNG"
+exclude = ["Fußgänger- und Radbrücke", "Fußgängerzone (teilw.)", "Gehbahn", "Gehbahn (teilw. + vollst.)", "Gehbahn (teilw.)", "Gehbahn (teilw.)  Fläche: 25 m² + 8m²", "Gehbahn (teilw.); Parkplatz", "Gehbahn (teilw.); Parkstreifen", "Gehbahn (wechselseitig)", "Gehbahn Parkstreifen", "Gehbahn; Parkstreifen", "Gehbahnen (teilw.)", "Gehbahnen (teilw.); Parkstreifen", "Pakstreifen (teilw.)", "Parkfläche", "Parkfläche (teilw.)", "Parkflächen (teilw.)", "Parkplatz", "Parkplatz (teilw.)", "Parkstreifen", "Parkstreifen teilweise", "Raf-/ Fußweg (teilw.)", "Treppe/ Gebäudedurchgang", "Verbindungsweg", "Verbindungsweg (teilw.)"]
+
+# No licence on Dresden's OGC API or its city map. Ask the Landeshauptstadt Dresden.
+[[source]]
+id = "de-sn-dresden"
+country = "DE"
+format = "geojson"
+url = "https://kommisdd.dresden.de/net4/public/ogcapi/collections/L60/items?f=json&limit=10000"
+poll_secs = 1800
+licence = "unconfirmed"
+attribution = "Landeshauptstadt Dresden, Straßen- und Tiefbauamt"
+
+[source.geojson]
+extra_urls = ["https://kommisdd.dresden.de/net4/public/ogcapi/collections/L150/items?f=json&limit=10000"]
+id_fields = ["typ", "datum_von", "datum_bis", "sperrgrund_format", "staid", "sta_id"]
+default_type = "roadworks"
+severity_field = "typ"
+closed_values = ["Vollsperrung"]
+restricted_values = ["Sperrung eines Fahrstreifens; halbseitige Sperrung: Verkehrsregelung durch Verkehrszeichen", "FB-teilweise mit erheblichen Einschränkungen"]
+headline_field = "sperrgrund_format"
+description_field = "typ"
+valid_from_field = "datum_von_format"
+valid_to_field = "datum_bis_format"
+lang = "de"
+
+[[source]]
+id = "de-sn-leipzig"
+country = "DE"
+format = "geojson"
+url = "https://geodienste.leipzig.de/l3/OpenData/wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typeNames=OpenData:verkehrsraumeinschraenkungen&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Stadt Leipzig"
+
+[source.geojson]
+id_fields = ["objectid"]
+type_field = "sparte"
+type_map = { "Straßenbau" = "roadworks", "Gleisbau" = "roadworks", "DB AG Gleisbau" = "roadworks", "Brückenbau" = "roadworks", "Trinkwasser" = "roadworks", "Abwasser" = "roadworks", "Fernwärme" = "roadworks", "Gas" = "roadworks", "Strom" = "roadworks", "Bahnstrom" = "roadworks", "Telekommunikation" = "roadworks", "Komplexer Leitungsbau" = "roadworks", "Stadtbeleuchtung" = "roadworks", "LSA/Koord.kabel" = "roadworks", "Begrünung" = "roadworks", "ASG Begrünung" = "roadworks", "Markierungsarbeiten" = "roadworks", "Absicherung Straßenschäden" = "roadworks", "Sondernutzung, Baustelleneinr." = "roadworks", "Sondernutzung, Kranstellung" = "roadworks", "Sondernutzung" = "roadworks", "Hinweisbeschilderung" = "roadworks", "stationäre Verkehrsregelung" = "roadworks", "Fahrradständer" = "roadworks", "Sonstiges" = "roadworks" }
+default_type = "roadworks"
+severity_field = "sperrart"
+closed_values = ["Vollsperrung"]
+restricted_values = ["halbseitige Sperrung"]
+headline_field = "sparte"
+description_field = "meldung"
+road_field = "adresse"
+valid_from_field = "beginn"
+valid_to_field = "ende"
+null_values = ["keine Meldung"]
+lang = "de"
+
+[[source.geojson.filters]]
+field = "sperrart"
+include = ["Vollsperrung", "halbseitige Sperrung", "Einschränkungen"]
+
+[[source.geojson.filters]]
+field = "sparte"
+exclude = ["Umzug", "Haltverbotszone"]
+
+[[source]]
+id = "de-hh-polizei"
+country = "DE"
+format = "geojson"
+url = "https://geodienste.hamburg.de/wfs_verkehrsinformation?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=de.hh.up:hauptmeldungen_aktuell&OUTPUTFORMAT=application/geo%2Bjson&SRSNAME=EPSG:4326"
+poll_secs = 300
+licence = "DL-DE-BY-2.0"
+attribution = "Freie und Hansestadt Hamburg, Polizei Hamburg"
+
+[source.geojson]
+id_fields = ["id"]
+type_field = "art"
+type_map = { "Accident" = "accident", "VehicleObstruction" = "obstruction", "GeneralObstruction" = "obstruction", "EnvironmentalObstruction" = "obstruction", "InfrastructureDamageObstruction" = "obstruction", "AbnormalTraffic" = "congestion", "MaintenanceWorks" = "roadworks", "ConstructionWorks" = "roadworks", "PoorEnvironmentConditions" = "conditions", "PublicEvent" = "other", "EquipmentOrSystemFault" = "other", "RoadOrCarriagewayOrLaneManagement" = "restriction", "ReroutingManagement" = "restriction", "SpeedManagement" = "restriction" }
+default_type = "roadworks"
+description_field = "description"
+lang = "de"
+
+[[source]]
+id = "be-brussels"
+country = "BE"
+format = "geojson"
+url = "https://data.mobility.brussels/datasets/v1/traffic/collections/traffic_events/items?f=json&limit=1000"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Bruxelles Mobilité / Brussel Mobiliteit"
+
+[source.geojson]
+crs = 3812
+id_fields = ["fid"]
+type_field = "datex_codes"
+type_map = { "RWK" = "roadworks", "EMR" = "other", "ACC" = "accident", "JAM" = "congestion" }
+default_type = "other"
+headline_field = "consequences_fr"
+road_field = "location_fr"
+lang = "fr"
+
+[[source]]
+id = "is-vegagerdin"
+country = "IS"
+format = "geojson"
+url = "https://gagnaveita.vegagerdin.is/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=gis:roadconditions_pointincident&outputFormat=application/json"
+poll_secs = 300
+licence = "CC-BY-4.0"
+attribution = "Vegagerðin (Icelandic Road and Coastal Administration)"
+
+[source.geojson]
+crs = 3057
+id_fields = ["ASTAND", "X", "Y", "STARTTIME"]
+type_field = "DESCRIPTION"
+type_map = { "Closed" = "closure", "Road repairs" = "roadworks", "Uneven road" = "conditions", "Flying gravel" = "conditions", "Animals on the road" = "obstruction", "Holes in road" = "obstruction", "Total axle weight limit" = "restriction" }
+default_type = "obstruction"
+headline_field = "DESCRIPTION"
+lon_field = "X"
+lat_field = "Y"
+
+[[source]]
+id = "is-vegagerdin-lines"
+country = "IS"
+format = "geojson"
+url = "https://gagnaveita.vegagerdin.is/geoserver/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=gis:roadconditions_lineincident&outputFormat=application/json"
+poll_secs = 300
+licence = "CC-BY-4.0"
+attribution = "Vegagerðin (Icelandic Road and Coastal Administration)"
+
+[source.geojson]
+crs = 3057
+id_fields = ["IDBUTUR"]
+type_field = "ROADCONDITION"
+type_map = { "Closed" = "closure", "Impassable" = "closure", "Impassable because of snow or weather" = "conditions", "Road repairs" = "roadworks", "Spots of ice" = "conditions", "Mountain vehicles" = "restriction", "No winter services" = "conditions" }
+default_type = "conditions"
+headline_field = "ROADCONDITION"
+description_field = "ADDITIONALINFORMATION"
+road_field = "ROADNUMBER"
+start_lon_field = "STARTX"
+start_lat_field = "STARTY"
+end_lon_field = "ENDX"
+end_lat_field = "ENDY"
+
+[[source.geojson.filters]]
+field = "ROADCONDITION"
+exclude = ["Easily passable", "Not known"]

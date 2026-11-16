@@ -1,6 +1,7 @@
 mod catalunya;
 mod datex;
 mod geo;
+mod geojson;
 mod http;
 mod matcher;
 mod model;

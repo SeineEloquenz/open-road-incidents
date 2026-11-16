@@ -8,6 +8,7 @@ use serde_json::Value;
 
 use crate::catalunya;
 use crate::datex;
+use crate::geojson::{self, GeoJsonConfig};
 use crate::http::Http;
 use crate::model::{Coord, Incident, Kind, Shape};
 use crate::sachsen;
@@ -23,6 +24,8 @@ pub enum Format {
     SachsenBis,
     /// The Servei Català de Trànsit's GML incidents.
     CatalunyaSct,
+    /// Plain GeoJSON, described by the source's `geojson` table.
+    Geojson,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -38,8 +41,12 @@ pub struct Source {
     pub attribution: String,
     #[serde(default = "default_true")]
     pub enabled: bool,
+    /// False for sources too vague for routing, such as roadworks without any word on how they affect traffic.
+    #[serde(default = "default_true")]
+    pub routing: bool,
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
+    pub geojson: Option<GeoJsonConfig>,
 }
 
 fn default_stale() -> u64 {
@@ -61,6 +68,14 @@ pub fn fetch(src: &Source, http: &Http, now: DateTime<Utc>) -> Result<Vec<Incide
         Format::Autobahn => autobahn(src, http)?,
         Format::SachsenBis => sachsen::parse(&http.get(&src.url, &src.headers)?)?,
         Format::CatalunyaSct => catalunya::parse(&http.get_text(&src.url, &src.headers)?)?,
+        Format::Geojson => {
+            let config = src.geojson.as_ref().context("a geojson source needs a geojson table")?;
+            let bodies = std::iter::once(&src.url)
+                .chain(&config.extra_urls)
+                .map(|url| Ok(serde_json::from_slice(&http.get(url, &src.headers)?)?))
+                .collect::<Result<Vec<Value>>>()?;
+            geojson::parse(&bodies, config)?
+        }
     };
     let total = incidents.len();
     incidents.retain(|i| !i.expired(now) && !i.shape.is_empty());
@@ -68,6 +83,7 @@ pub fn fetch(src: &Source, http: &Http, now: DateTime<Utc>) -> Result<Vec<Incide
         inc.id = format!("{}:{}", src.id, inc.id);
         inc.source = src.id.clone();
         inc.country = src.country.clone();
+        inc.map_only = !src.routing;
     }
     info!("{}: {} records, {} kept", src.id, total, incidents.len());
     Ok(incidents)

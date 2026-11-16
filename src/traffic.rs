@@ -131,7 +131,7 @@ fn encode(kph: u32) -> u64 {
 }
 
 fn active(i: &Incident, now: DateTime<Utc>) -> bool {
-    i.valid_from.is_none_or(|t| t <= now) && !i.expired(now)
+    !i.map_only && i.valid_from.is_none_or(|t| t <= now) && !i.expired(now)
 }
 
 fn index(file: &File) -> Result<HashMap<u64, Tile>> {
@@ -219,6 +219,22 @@ mod tests {
         let mut i = incident(Kind::Roadworks, edges, from);
         i.road_closed = true;
         i
+    }
+
+    #[test]
+    fn map_only_incidents_leave_routing_alone() {
+        let dir = std::env::temp_dir().join(format!("ori-traffic-map-only-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let tar = traffic_tar(&dir, 4);
+        let now = Utc::now();
+        let mut traffic = LiveTraffic::open(&tar, dir.join("state.json"), "t1").unwrap();
+        let mut shown = closure(vec![edge(1)], Some(now - Duration::hours(1)));
+        shown.map_only = true;
+
+        traffic.apply([&shown], now).unwrap();
+
+        assert_eq!(stored(&tar, edge(1).id), UNKNOWN);
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

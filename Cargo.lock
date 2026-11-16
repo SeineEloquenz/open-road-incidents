@@ -585,6 +585,7 @@ dependencies = [
  "flate2",
  "log",
  "proj4rs",
+ "regex",
  "roxmltree",
  "serde",
  "serde_json",
