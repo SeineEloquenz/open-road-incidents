@@ -63,6 +63,9 @@ if [ "${FORCE:-0}" != 1 ] && [ "$(cat "$dir/work/built" 2>/dev/null)" = "$inputs
 fi
 
 rm -rf "$dir/work/tiles"
+# Neighbouring extracts overlap at borders. Valhalla aborts on the duplicates, so they are merged into one file first.
+merged="$dir/work/roads.osm.pbf"
+osmium merge --overwrite -o "$merged" "${roads[@]}"
 config="$dir/work/valhalla.json"
 valhalla_build_config \
   --mjolnir-tile-dir "$dir/work/tiles" \
@@ -71,9 +74,9 @@ valhalla_build_config \
   --mjolnir-concurrency "$concurrency" \
   --mjolnir-admin "" \
   --mjolnir-timezone "" >"$config"
-valhalla_build_tiles -c "$config" "${roads[@]}"
+valhalla_build_tiles -c "$config" "$merged"
 valhalla_build_extract -c "$config" -t -O
-rm -rf "$dir/work/tiles"
+rm -rf "$dir/work/tiles" "$merged"
 mv "$dir/work/valhalla_tiles.tar" "$dir/work/traffic.tar" "$dir/ready/"
 echo "$inputs" >"$dir/work/built"
 echo "Built $dir/ready/valhalla_tiles.tar and $dir/ready/traffic.tar"
