@@ -67,8 +67,10 @@ fn parse_record(rec: Node) -> Option<Record> {
     inc.severity = text(rec, "severity")
         .or_else(|| situation.and_then(|s| text(s, "overallSeverity")))
         .map(str::to_string);
-    inc.road = text(rec, "roadName")
-        .or_else(|| text(rec, "roadNumber"))
+    inc.road = [text(rec, "roadNumber"), inner_text(rec, "roadName")]
+        .into_iter()
+        .flatten()
+        .find(|r| !r.is_empty())
         .map(str::to_string);
     inc.valid_from = validity.and_then(|v| text(v, "overallStartTime")).and_then(parse_time);
     inc.valid_until = validity.and_then(|v| text(v, "overallEndTime")).and_then(parse_time);
@@ -193,6 +195,15 @@ fn child<'a, 'i>(n: Node<'a, 'i>, name: &str) -> Option<Node<'a, 'i>> {
     n.children().find(|c| c.tag_name().name() == name)
 }
 
+/// The first non-empty text inside the first element called [name], for values DATEX II v2 wraps in `values/value`.
+fn inner_text<'a>(n: Node<'a, '_>, name: &str) -> Option<&'a str> {
+    n.descendants()
+        .find(|d| d.tag_name().name() == name)?
+        .descendants()
+        .filter_map(|d| d.text().map(str::trim))
+        .find(|t| !t.is_empty())
+}
+
 fn text<'a>(n: Node<'a, '_>, name: &str) -> Option<&'a str> {
     n.descendants()
         .find(|d| d.tag_name().name() == name)?
@@ -257,6 +268,18 @@ mod tests {
             panic!("expected points")
         };
         assert!((points[0][0] - 4.107091).abs() < 1e-5 && (points[0][1] - 51.032432).abs() < 1e-5);
+    }
+
+    #[test]
+    fn v2_gml_line_with_latitude_first() {
+        let inc = one(include_str!("../tests/fixtures/de-bw-v2.xml"));
+        assert_eq!(inc.id, "52738326-52738328-52738331-52741904");
+        assert_eq!(inc.kind, Kind::Roadworks);
+        assert_eq!(inc.road.as_deref(), Some("L153"));
+        let Shape::Lines(lines) = inc.shape else {
+            panic!("expected lines")
+        };
+        assert_eq!(lines[0][0], [8.088319, 47.62219]);
     }
 
     #[test]

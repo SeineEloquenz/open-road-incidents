@@ -69,3 +69,12 @@ url = "https://verkehr.autobahn.de/o/autobahn"
 poll_secs = 900
 licence = "unconfirmed"
 attribution = "Die Autobahn GmbH des Bundes"
+
+[[source]]
+id = "de-bw"
+country = "DE"
+format = "datex"
+url = "https://api.mobidata-bw.de/datasets/traffic/roadworks/roadworks_svzbw.datex2.xml"
+poll_secs = 900
+licence = "DL-DE-BY-2.0"
+attribution = "Straßenbauverwaltung Baden-Württemberg / MobiData BW"
