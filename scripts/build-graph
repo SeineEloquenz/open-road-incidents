@@ -11,6 +11,16 @@ if [ ${#regions[@]} -eq 0 ]; then
   regions=(europe/finland europe/france europe/luxembourg europe/netherlands europe/belgium europe/spain europe/germany)
 fi
 concurrency=${CONCURRENCY:-$(($(nproc) / 2))}
+# Closures and slowdowns only change car routes, so the graph holds only ways a car may use.
+# shellcheck disable=SC2054
+roads_filter=(
+  w/highway=motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link
+  w/highway=unclassified,residential,living_street,service,road
+  w/route=ferry
+  r/type=restriction
+)
+# Changing roads_filter needs a new name here, or the extracts filtered before are kept.
+filter_name=cars1
 
 mkdir -p "$dir/pbf" "$dir/work" "$dir/ready"
 dir=$(cd "$dir" && pwd)
@@ -42,19 +52,19 @@ for region in "${regions[@]}"; do
   else
     download "$raw" "$region"
   fi
-  version=$(replication "$raw")
+  version="$(replication "$raw") $filter_name"
   if [ ! -f "$filtered" ] || [ "$(cat "$filtered.version" 2>/dev/null)" != "$version" ]; then
-    # Valhalla reads only roads, paths, ferries and turn restrictions. Nodes of kept ways stay, with their barrier and signal tags.
-    if ! osmium tags-filter --overwrite -o "$filtered" "$raw" w/highway w/route=ferry r/type=restriction; then
+    # Nodes of kept ways stay, with their barrier and signal tags.
+    if ! osmium tags-filter --overwrite -o "$filtered" "$raw" "${roads_filter[@]}"; then
       echo "$raw is unreadable, downloading it again" >&2
       download "$raw" "$region"
-      version=$(replication "$raw")
-      osmium tags-filter --overwrite -o "$filtered" "$raw" w/highway w/route=ferry r/type=restriction
+      version="$(replication "$raw") $filter_name"
+      osmium tags-filter --overwrite -o "$filtered" "$raw" "${roads_filter[@]}"
     fi
     echo "$version" >"$filtered.version"
   fi
   roads+=("$filtered")
-  inputs+="$name=$version "
+  inputs+="$name=${version// /:} "
 done
 
 if [ "${FORCE:-0}" != 1 ] && [ "$(cat "$dir/work/built" 2>/dev/null)" = "$inputs" ]; then
