@@ -79,13 +79,18 @@ impl Matcher {
 
     /// Fills `osm_way_ids`, `edges` and `match_status`. Errors mean Valhalla itself failed and the incident stays pending.
     pub fn match_incident(&mut self, inc: &mut Incident) -> Result<()> {
-        let key = geo::stable_hash(&serde_json::to_vec(&(&inc.shape, &self.tileset, CACHE_VERSION))?);
+        let key = geo::stable_hash(&serde_json::to_vec(&(
+            &inc.shape,
+            inc.both_directions,
+            &self.tileset,
+            CACHE_VERSION,
+        ))?);
         self.used.insert(key);
         let cached = match self.cache.get(&key) {
             Some(c) => c.clone(),
             None => {
                 let c = Cached {
-                    matched: self.match_shape(&inc.shape)?,
+                    matched: self.match_shape(&inc.shape, inc.both_directions)?,
                 };
                 self.cache.insert(key, c.clone());
                 c
@@ -113,14 +118,18 @@ impl Matcher {
         crate::publish::write_atomic(&self.cache_path, &serde_json::to_vec(&self.cache)?)
     }
 
-    fn match_shape(&self, shape: &Shape) -> Result<Option<Matched>> {
+    fn match_shape(&self, shape: &Shape, both_directions: bool) -> Result<Option<Matched>> {
         let mut all = Matched::default();
         let mut any = false;
         let parts: Vec<Option<Matched>> = match shape {
             Shape::Lines(lines) => lines
                 .iter()
                 .filter(|l| l.len() >= 2)
-                .map(|l| self.trace(l, "map_snap"))
+                .flat_map(|l| {
+                    let reversed = both_directions.then(|| l.iter().rev().copied().collect::<Vec<_>>());
+                    [Some(l.clone()), reversed].into_iter().flatten()
+                })
+                .map(|l| self.trace(&l, "map_snap"))
                 .collect::<Result<_>>()?,
             Shape::Spans(spans) => spans.iter().map(|s| self.span(*s)).collect::<Result<_>>()?,
             Shape::Points(points) => points.iter().map(|p| self.locate(*p)).collect::<Result<_>>()?,

@@ -8,17 +8,29 @@ use crate::model::Coord;
 const LAMBERT72: &str = "+proj=lcc +lat_0=90 +lon_0=4.36748666666667 +lat_1=51.1666672333333 \
     +lat_2=49.8333339 +x_0=150000.013 +y_0=5400088.438 +ellps=intl \
     +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs";
+const UTM33: &str = "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
 const WGS84: &str = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
 
 /// Belgian Lambert 72 (EPSG:31370) to WGS84.
 pub fn from_lambert72(x: f64, y: f64) -> Result<Coord> {
     static PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
-    let (src, dst) = PROJS.get_or_init(|| {
-        (
-            Proj::from_proj_string(LAMBERT72).expect("valid Lambert 72 definition"),
-            Proj::from_proj_string(WGS84).expect("valid WGS84 definition"),
-        )
-    });
+    to_wgs84(PROJS.get_or_init(|| projections(LAMBERT72)), x, y)
+}
+
+/// ETRS89 / UTM zone 33N (EPSG:25833) to WGS84.
+pub fn from_utm33(x: f64, y: f64) -> Result<Coord> {
+    static PROJS: OnceLock<(Proj, Proj)> = OnceLock::new();
+    to_wgs84(PROJS.get_or_init(|| projections(UTM33)), x, y)
+}
+
+fn projections(source: &str) -> (Proj, Proj) {
+    (
+        Proj::from_proj_string(source).expect("valid projection definition"),
+        Proj::from_proj_string(WGS84).expect("valid WGS84 definition"),
+    )
+}
+
+fn to_wgs84((src, dst): &(Proj, Proj), x: f64, y: f64) -> Result<Coord> {
     let mut p = (x, y, 0.0);
     proj4rs::transform::transform(src, dst, &mut p).map_err(|e| anyhow!("reprojection failed: {e:?}"))?;
     Ok([p.0.to_degrees(), p.1.to_degrees()])

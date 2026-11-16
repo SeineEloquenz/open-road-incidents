@@ -9,6 +9,7 @@ use serde_json::Value;
 use crate::datex;
 use crate::http::Http;
 use crate::model::{Coord, Incident, Kind, Shape};
+use crate::sachsen;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -17,6 +18,8 @@ pub enum Format {
     /// Fintraffic DATEX II for attributes plus its GeoJSON API for geometry.
     DigitrafficFi,
     Autobahn,
+    /// Saxony's road works information system, a zip of GeoJSON.
+    SachsenBis,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -53,6 +56,7 @@ pub fn fetch(src: &Source, http: &Http, now: DateTime<Utc>) -> Result<Vec<Incide
             .collect(),
         Format::DigitrafficFi => digitraffic(src, http)?,
         Format::Autobahn => autobahn(src, http)?,
+        Format::SachsenBis => sachsen::parse(&http.get(&src.url, &src.headers)?)?,
     };
     let total = incidents.len();
     incidents.retain(|i| !i.expired(now) && !i.shape.is_empty());

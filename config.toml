@@ -78,3 +78,12 @@ url = "https://api.mobidata-bw.de/datasets/traffic/roadworks/roadworks_svzbw.dat
 poll_secs = 900
 licence = "DL-DE-BY-2.0"
 attribution = "Straßenbauverwaltung Baden-Württemberg / MobiData BW"
+
+[[source]]
+id = "de-sn"
+country = "DE"
+format = "sachsen-bis"
+url = "http://www.list.smwa.sachsen.de/gdi/download/baustelleninfo/Baustelleninfo_Sachsen_geojson.zip"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Landesamt für Straßenbau und Verkehr des Landes Sachsen, Baustelleninformationssystem Sachsen"
