@@ -1,3 +1,4 @@
+mod catalunya;
 mod datex;
 mod geo;
 mod http;

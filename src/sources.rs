@@ -6,6 +6,7 @@ use log::info;
 use serde::Deserialize;
 use serde_json::Value;
 
+use crate::catalunya;
 use crate::datex;
 use crate::http::Http;
 use crate::model::{Coord, Incident, Kind, Shape};
@@ -20,6 +21,8 @@ pub enum Format {
     Autobahn,
     /// Saxony's road works information system, a zip of GeoJSON.
     SachsenBis,
+    /// The Servei Català de Trànsit's GML incidents.
+    CatalunyaSct,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -57,6 +60,7 @@ pub fn fetch(src: &Source, http: &Http, now: DateTime<Utc>) -> Result<Vec<Incide
         Format::DigitrafficFi => digitraffic(src, http)?,
         Format::Autobahn => autobahn(src, http)?,
         Format::SachsenBis => sachsen::parse(&http.get(&src.url, &src.headers)?)?,
+        Format::CatalunyaSct => catalunya::parse(&http.get_text(&src.url, &src.headers)?)?,
     };
     let total = incidents.len();
     incidents.retain(|i| !i.expired(now) && !i.shape.is_empty());

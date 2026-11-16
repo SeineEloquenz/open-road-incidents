@@ -87,3 +87,13 @@ url = "http://www.list.smwa.sachsen.de/gdi/download/baustelleninfo/Baustelleninf
 poll_secs = 1800
 licence = "CC-BY-4.0"
 attribution = "Landesamt für Straßenbau und Verkehr des Landes Sachsen, Baustelleninformationssystem Sachsen"
+
+# Reuse terms not published; Spain's access point lists it as "No licence - No contract". Ask the Servei Català de Trànsit.
+[[source]]
+id = "es-sct"
+country = "ES"
+format = "catalunya-sct"
+url = "http://www.gencat.cat/transit/opendata/incidenciesGML.xml"
+poll_secs = 300
+licence = "unconfirmed"
+attribution = "Servei Català de Trànsit"
