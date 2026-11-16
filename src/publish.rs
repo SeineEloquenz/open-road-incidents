@@ -135,6 +135,7 @@ fn tiles(root: &Path, collection: &Value) -> Result<()> {
             "-z14",
             "--simplify-only-low-zooms",
             "-r1",
+            "--drop-densest-as-needed",
             "-e",
         ])
         .arg(&fresh)
