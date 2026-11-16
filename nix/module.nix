@@ -168,6 +168,7 @@ in
       wants = [ "network-online.target" ];
       requires = [ "valhalla.service" ];
       partOf = [ "valhalla.service" ];
+      unitConfig.ConditionPathExists = [ "|${graphDir}/valhalla_tiles.tar" "|${graphDir}/incoming/valhalla_tiles.tar" ];
       environment.ORI_CONFIG = configFile;
       serviceConfig = {
         User = "open-road-incidents";
@@ -198,7 +199,7 @@ in
           ready=${dataDir}/graph/ready
           if [ -f $ready/valhalla_tiles.tar ] && [ -f $ready/traffic.tar ]; then
             mv $ready/valhalla_tiles.tar $ready/traffic.tar ${graphDir}/incoming/
-            systemctl restart valhalla.service
+            systemctl restart valhalla.service open-road-incidents.service
           fi
         '';
         TimeoutStartSec = "infinity";
