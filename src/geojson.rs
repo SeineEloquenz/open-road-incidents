@@ -17,6 +17,16 @@ pub struct GeoJsonConfig {
     pub extra_urls: Vec<String>,
     #[serde(default = "wgs84")]
     pub crs: u32,
+    /// Where the list of records sits in a response, empty for a response that is the list.
+    #[serde(default = "features")]
+    pub features_path: String,
+    /// Where a record keeps its fields, empty for fields on the record itself.
+    #[serde(default = "properties")]
+    pub properties_path: String,
+    #[serde(default = "geometry")]
+    pub geometry_path: String,
+    /// A field holding a line as `lat lon lat lon …`.
+    pub polyline_field: Option<String>,
     /// Joined to identify a feature. Without any, the feature's `id` is used.
     #[serde(default)]
     pub id_fields: Vec<String>,
@@ -78,6 +88,51 @@ fn wgs84() -> u32 {
     4326
 }
 
+fn features() -> String {
+    "features".into()
+}
+
+fn properties() -> String {
+    "properties".into()
+}
+
+fn geometry() -> String {
+    "geometry".into()
+}
+
+/// The items of a GeoRSS feed as records under `items`, each with its text fields and `lat` and `lon` from
+/// `georss:point`, so a geojson table can describe them.
+pub fn rss_items(xml: &str) -> Result<Value> {
+    let doc = roxmltree::Document::parse(xml.trim_start_matches('\u{feff}')).context("invalid XML")?;
+    let items = doc
+        .descendants()
+        .filter(|n| n.tag_name().name() == "item")
+        .map(|item| {
+            let mut record = serde_json::Map::new();
+            for child in item.children().filter(|c| c.is_element()) {
+                let text = child.text().unwrap_or_default().trim();
+                if child.tag_name().name() == "point" {
+                    if let Some((lat, lon)) = text.split_once(' ') {
+                        record.insert("lat".into(), Value::String(lat.into()));
+                        record.insert("lon".into(), Value::String(lon.trim().into()));
+                    }
+                } else {
+                    record.insert(child.tag_name().name().into(), Value::String(text.into()));
+                }
+            }
+            Value::Object(record)
+        })
+        .collect();
+    Ok(serde_json::json!({ "items": Value::Array(items) }))
+}
+
+fn at<'a>(v: &'a Value, path: &str) -> Option<&'a Value> {
+    if path.is_empty() {
+        return Some(v);
+    }
+    path.split('.').try_fold(v, |cur, key| cur.get(key))
+}
+
 fn roadworks() -> String {
     "roadworks".into()
 }
@@ -112,8 +167,8 @@ pub fn parse(bodies: &[Value], config: &GeoJsonConfig) -> Result<Vec<Incident>> 
     };
     let mut out = Vec::new();
     for body in bodies {
-        let Some(features) = body["features"].as_array() else {
-            bail!("not a feature collection")
+        let Some(features) = at(body, &config.features_path).and_then(Value::as_array) else {
+            bail!("no list of records at {:?}", config.features_path)
         };
         out.extend(features.iter().filter_map(|f| feature(f, config, &patterns)));
     }
@@ -121,7 +176,7 @@ pub fn parse(bodies: &[Value], config: &GeoJsonConfig) -> Result<Vec<Incident>> 
 }
 
 fn feature(f: &Value, config: &GeoJsonConfig, patterns: &Patterns) -> Option<Incident> {
-    let props = &f["properties"];
+    let props = at(f, &config.properties_path)?;
     let field = |name: &Option<String>| name.as_deref().and_then(|n| value(props, n, &config.null_values));
     for (filter, excluded) in config.filters.iter().zip(&patterns.excluded) {
         let v = value(props, &filter.field, &config.null_values);
@@ -200,7 +255,7 @@ fn id(f: &Value, props: &Value, config: &GeoJsonConfig) -> Option<String> {
 
 fn shape(f: &Value, props: &Value, config: &GeoJsonConfig) -> Option<Shape> {
     let number = |name: &Option<String>| -> Option<f64> {
-        let v = &props[name.as_deref()?];
+        let v = at(props, name.as_deref()?)?;
         v.as_f64().or_else(|| v.as_str()?.replace(',', ".").parse().ok())
     };
     let convert = |x: f64, y: f64| geo::from_epsg(config.crs, x, y).ok();
@@ -215,9 +270,28 @@ fn shape(f: &Value, props: &Value, config: &GeoJsonConfig) -> Option<Shape> {
     if let (Some(x), Some(y)) = (number(&config.lon_field), number(&config.lat_field)) {
         return Some(Shape::Points(vec![convert(x, y)?]));
     }
+    if let Some(text) = config.polyline_field.as_deref().and_then(|n| at(props, n)?.as_str()) {
+        let nums: Vec<f64> = text.split_whitespace().filter_map(|n| n.parse().ok()).collect();
+        let line: Vec<Coord> = nums
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .filter_map(|[lat, lon]| convert(*lon, *lat))
+            .collect();
+        return match line.len() {
+            0 => None,
+            1 => Some(Shape::Points(line)),
+            _ => Some(Shape::Lines(vec![line])),
+        };
+    }
     let mut lines = Vec::new();
     let mut points = Vec::new();
-    collect(&f["geometry"], config.crs, &mut lines, &mut points);
+    collect(
+        at(f, &config.geometry_path).unwrap_or(&Value::Null),
+        config.crs,
+        &mut lines,
+        &mut points,
+    );
     if !lines.is_empty() {
         Some(Shape::Lines(lines))
     } else if !points.is_empty() {
@@ -277,29 +351,36 @@ fn value(v: &Value, path: &str, nulls: &[String]) -> Option<String> {
         Value::String(s) => s.trim().to_string(),
         Value::Number(n) => n.to_string(),
         Value::Bool(b) => b.to_string(),
-        _ => return None,
+        Value::Array(_) | Value::Object(_) => cur.to_string(),
+        Value::Null => return None,
     };
     Some(s).filter(|s| !s.is_empty() && !nulls.contains(s))
 }
 
 fn split_range(range: &str) -> (Option<String>, Option<String>) {
-    let mut parts = range.splitn(2, [' ', '–']).map(str::trim);
-    let from = parts.next().map(str::to_string);
-    let rest = parts
-        .next()
-        .unwrap_or_default()
-        .trim_start_matches(['-', '–', ' ', 'b', 'i', 's']);
-    (from, Some(rest.trim().to_string()).filter(|s| !s.is_empty()))
+    let range = range.trim().trim_start_matches("von ").trim();
+    let (from, until) = [" bis ", " - ", " – ", "–"]
+        .iter()
+        .find_map(|sep| range.split_once(sep))
+        .unwrap_or((range, ""));
+    let clean = |s: &str| Some(s.trim().to_string()).filter(|s| !s.is_empty());
+    (clean(from), clean(until))
 }
 
 /// Dates as sources write them. Without a zone, Central European Time is assumed, close enough for the whole days
 /// most sources give. A date without a time means the start of that day, or its end for an end date.
 fn time(s: &str, end: bool) -> Option<DateTime<Utc>> {
+    let s = s.trim().trim_end_matches("Uhr").trim();
     if let Ok(t) = DateTime::parse_from_rfc3339(s) {
         return Some(t.to_utc());
     }
-    if let Ok(ms) = s.parse::<i64>() {
-        return DateTime::from_timestamp_millis(ms);
+    if let Ok(n) = s.parse::<i64>() {
+        // Below 10^11 a count reads as seconds, since milliseconds that small would fall in early 1973.
+        return if n.abs() < 100_000_000_000 {
+            DateTime::from_timestamp(n, 0)
+        } else {
+            DateTime::from_timestamp_millis(n)
+        };
     }
     let local = |t: NaiveDateTime| {
         FixedOffset::east_opt(3600)?
@@ -323,7 +404,7 @@ fn time(s: &str, end: bool) -> Option<DateTime<Utc>> {
     } else {
         NaiveTime::MIN
     };
-    for format in ["%Y-%m-%d", "%d.%m.%Y", "%d.%m.%y"] {
+    for format in ["%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%d.%m.%y"] {
         if let Ok(d) = NaiveDate::parse_from_str(s.get(..10).unwrap_or(s), format)
             .or_else(|_| NaiveDate::parse_from_str(s, format))
         {
@@ -413,6 +494,53 @@ mod tests {
             (p[0][0] - 9.186663).abs() < 1e-5 && (p[0][1] - 48.781435).abs() < 1e-5,
             "{p:?}"
         );
+    }
+
+    #[test]
+    fn reads_the_periods_sources_write() {
+        let period = |range: &str| {
+            let (from, until) = split_range(range);
+            (
+                time(&from.unwrap(), false).unwrap().to_rfc3339(),
+                time(&until.unwrap(), true).unwrap().to_rfc3339(),
+            )
+        };
+
+        assert_eq!(
+            period("2026-10-12 23:00:00 bis 2026-11-29 22:59:00"),
+            ("2026-10-12T22:00:00+00:00".into(), "2026-11-29T21:59:00+00:00".into())
+        );
+        assert_eq!(
+            period("von 16.11.2026 19:00 Uhr bis 17.11.2026 05:00 Uhr"),
+            ("2026-11-16T18:00:00+00:00".into(), "2026-11-17T04:00:00+00:00".into())
+        );
+        assert_eq!(
+            period("01.03.2026 - 21/03/2027"),
+            ("2026-02-28T23:00:00+00:00".into(), "2027-03-21T22:59:59+00:00".into())
+        );
+    }
+
+    #[test]
+    fn records_outside_feature_collections_and_rss_items() {
+        let lithuania = json!([{"_id": "x", "type": "ROADWORKS",
+            "location": {"polyline": "56.24 24.85 56.25 24.86"}}]);
+        let cfg: GeoJsonConfig = serde_json::from_value(json!({
+            "features_path": "", "properties_path": "", "id_fields": ["_id"], "polyline_field": "location.polyline"
+        }))
+        .unwrap();
+        let inc = parse(&[lithuania], &cfg).unwrap().remove(0);
+        assert_eq!(inc.shape, Shape::Lines(vec![vec![[24.85, 56.24], [24.86, 56.25]]]));
+
+        let rss = r#"<rss xmlns:georss="http://www.georss.org/georss"><channel><item><title>A40 closed</title>
+            <guid>g1</guid><georss:point>51.7272 -4.067661</georss:point></item></channel></rss>"#;
+        let cfg: GeoJsonConfig = serde_json::from_value(json!({
+            "features_path": "items", "properties_path": "", "id_fields": ["guid"], "lat_field": "lat", "lon_field": "lon",
+            "headline_field": "title"
+        }))
+        .unwrap();
+        let inc = parse(&[rss_items(rss).unwrap()], &cfg).unwrap().remove(0);
+        assert_eq!(inc.shape, Shape::Points(vec![[-4.067661, 51.7272]]));
+        assert_eq!(inc.description.as_deref(), Some("A40 closed"));
     }
 
     #[test]

@@ -685,3 +685,1319 @@ end_lat_field = "ENDY"
 [[source.geojson.filters]]
 field = "ROADCONDITION"
 exclude = ["Easily passable", "Not known"]
+
+[[source]]
+id = "nl-ndw-afsluitingen"
+country = "NL"
+format = "datex"
+url = "https://opendata.ndw.nu/tijdelijke_verkeersmaatregelen_afsluitingen.xml.gz"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "NDW"
+
+# Each Hamburg roadworks entry describes several streets in free text, so it only shows on the map.
+[[source]]
+id = "de-hh-baustellen"
+country = "DE"
+format = "geojson"
+url = "https://api.hamburg.de/datasets/v1/baustellen/collections/baustelle/items?f=json&limit=10000"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Freie und Hansestadt Hamburg"
+routing = false
+
+[source.geojson]
+headline_field = "titel"
+description_field = "umfang"
+valid_from_field = "baubeginn"
+valid_to_field = "bauende"
+lang = "de"
+
+[[source]]
+id = "de-bb"
+country = "DE"
+format = "geojson"
+url = "https://ogc-api.geobasis-bb.de/datasets/baustelleninfo/collections/baustelleninfo/items?f=json&limit=10000"
+poll_secs = 1800
+licence = "DL-DE-BY-2.0"
+attribution = "Landesbetrieb Straßenwesen Brandenburg"
+
+[source.geojson]
+id_fields = ["ID"]
+severity_field = "Verkehrsinformation"
+closed_pattern = "vollsperrung|voll gesperrt"
+restricted_pattern = "halbseitig|wechselseitig|fahrstreifen|einengung"
+description_field = "Verkehrsinformation"
+road_field = "Straßenummner"
+valid_from_field = "Baustellen_Beginn"
+valid_to_field = "Baustellen_Ende"
+lang = "de"
+
+[[source]]
+id = "de-sh"
+country = "DE"
+format = "geojson"
+url = "https://dienste.gdi-sh.de/WFS_SH_Baustelleninformationen?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=Baustelleninformationen:Baustellen_SH&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG:4326"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "© LBV.SH/CC BY 4.0"
+
+[source.geojson]
+id_fields = ["GmlID"]
+severity_field = "Verkehrseinschränkung"
+closed_values = ["Vollsperrung"]
+restricted_values = ["Halbseitigige Sperrung mit Verkehrszeichen", "Halbseitigige Sperrung mit Lichtsignalanlagenreg", "Halbseitigige Sperrung mit Einbahnstraßenregelun", "Fahrbahneinengung", "Reduzierung von Fahrstreifen"]
+headline_field = "Art_der_Maßnahme"
+description_field = "Hinweise_zur_Verkehrsführung"
+road_field = "Straßenname"
+validity_range_field = "Dauer_der_Bauphase"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "Verkehrseinschränkung"
+exclude = ["Haltverbot", "Sperrung Gehweg", "Sperrung Radweg", "Sperrung Grünstreifen"]
+
+[[source]]
+id = "de-sh-points"
+country = "DE"
+format = "geojson"
+url = "https://dienste.gdi-sh.de/WFS_SH_Baustelleninformationen?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=Baustelleninformationen:Baustellenpunkte_SH&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG:4326"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "© LBV.SH/CC BY 4.0"
+
+[source.geojson]
+id_fields = ["GmlID"]
+severity_field = "VERKEHRSEINSCHRÄNKUNG"
+closed_values = ["Vollsperrung"]
+restricted_values = ["Halbseitigige Sperrung mit Verkehrszeichen", "Halbseitigige Sperrung mit Lichtsignalanlagenreg", "Halbseitigige Sperrung mit Einbahnstraßenregelun", "Fahrbahneinengung", "Reduzierung von Fahrstreifen"]
+headline_field = "Art_der_Maßnahme"
+description_field = "HINWEISE_ZUR_VERKEHRSFÜHRUNG"
+road_field = "Straßenname"
+validity_range_field = "Dauer_der_Bauphase"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "VERKEHRSEINSCHRÄNKUNG"
+exclude = ["Haltverbot", "Sperrung Gehweg", "Sperrung Radweg", "Sperrung Grünstreifen"]
+
+[[source]]
+id = "de-mv"
+country = "DE"
+format = "geojson"
+url = "https://dienste.gdi-sh.de/WFS_SH_Baustelleninformationen?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=Baustelleninformationen:Baustellen_MV&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG:4326"
+poll_secs = 1800
+licence = "LicenseRef-GeoNutzV"
+attribution = "Landesamt für Straßenbau und Verkehr Mecklenburg-Vorpommern, via LBV.SH"
+
+[source.geojson]
+id_fields = ["GmlID"]
+severity_field = "Erläuterung"
+closed_pattern = "vollsperr"
+closed_exception_pattern = "zeitweise|nachts|nächtlich"
+restricted_pattern = "halbseitig|einengung|fahrstreifen|zeitweise"
+headline_field = "Sperrart"
+description_field = "Erläuterung"
+valid_from_field = "Baubeginn"
+valid_to_field = "Bauende"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "Sperrart"
+exclude = ["Radwegneubau", "Radweginstandsetzung", "Arbeiten an Geh-/Radwegen"]
+
+[[source]]
+id = "de-ni"
+country = "DE"
+format = "geojson"
+url = "https://dienste.gdi-sh.de/WFS_SH_Baustelleninformationen?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=Baustelleninformationen:Baustellen_Niedersachsen&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG:4326"
+poll_secs = 1800
+licence = "DL-DE-ZERO-2.0"
+attribution = "Niedersächsische Landesbehörde für Straßenbau und Verkehr, via LBV.SH"
+
+[source.geojson]
+id_fields = ["GmlID"]
+severity_field = "Verkehrseinschränkung"
+restricted_values = ["Sperrung"]
+headline_field = "Art_der_Maßnahme"
+road_field = "Straßenname"
+validity_range_field = "Dauer_der_Bauphase"
+lang = "de"
+
+[[source.geojson.filters]]
+field = "Verkehrseinschränkung"
+exclude = ["keine Verkehrseinschränkung"]
+
+[[source]]
+id = "de-sh-lms"
+country = "DE"
+format = "geojson"
+url = "https://dienste.gdi-sh.de/WFS_SH_Baustelleninformationen?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=Baustelleninformationen:Verkehrsstoerungen&OUTPUTFORMAT=GEOJSON&SRSNAME=EPSG:4326"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "© LBV.SH/CC BY 4.0, Landesmeldestelle Schleswig-Holstein"
+
+[source.geojson]
+id_fields = ["GmlID"]
+severity_field = "Ereignis"
+closed_pattern = "^gesperrt"
+restricted_pattern = "gesperrt|verengt"
+headline_field = "Verkehrs-_und_Reiseereignis"
+road_field = "Straßenname"
+validity_range_field = "Dauer"
+lang = "de"
+
+[[source]]
+id = "fr-lyon"
+country = "FR"
+format = "geojson"
+url = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows?SERVICE=WFS&VERSION=2.0.0&request=GetFeature&typename=metropole-de-lyon:pvo_patrimoine_voirie.pvochantierperturbant&outputFormat=application/json&SRSNAME=EPSG:4326"
+poll_secs = 3600
+licence = "etalab-2.0"
+attribution = "Métropole de Lyon"
+
+[source.geojson]
+id_fields = ["gid"]
+severity_field = "typeperturbation"
+closed_values = ["Circulation interdite"]
+restricted_values = ["Circulation réduite", "Circulation alternée", "Circulation sens unique", "Circulation interdite de jour", "Circulation réduite de jour", "Circulation alternée de jour"]
+headline_field = "nomchantier"
+description_field = "precisionlocalisation"
+road_field = "nom"
+valid_from_field = "debutchantier"
+valid_to_field = "finchantier"
+lang = "fr"
+
+[[source]]
+id = "fr-toulouse"
+country = "FR"
+format = "geojson"
+url = "https://data.toulouse-metropole.fr/api/explore/v2.1/catalog/datasets/chantiers-en-cours/exports/geojson"
+poll_secs = 3600
+licence = "etalab-2.0"
+attribution = "Toulouse Métropole"
+
+[source.geojson]
+id_fields = ["numero"]
+severity_field = "circulation"
+closed_pattern = "rue barrée"
+restricted_pattern = "alternat|occupation de [0-9]+ file"
+headline_field = "libelle"
+description_field = "circulation"
+road_field = "voie"
+valid_from_field = "datedebut"
+valid_to_field = "datefin"
+lang = "fr"
+
+[[source.geojson.filters]]
+field = "circulation"
+exclude = ["Occupation du trottoir", "Occupation de la contre allée"]
+
+# Bordeaux, Lille, Liège and Namur say nothing about how their works affect traffic, so they only show on the map.
+[[source]]
+id = "fr-bordeaux"
+country = "FR"
+format = "geojson"
+url = "https://opendata.bordeaux-metropole.fr/api/explore/v2.1/catalog/datasets/ci_chantier/exports/geojson"
+poll_secs = 3600
+licence = "etalab-2.0"
+attribution = "Bordeaux Métropole"
+routing = false
+
+[source.geojson]
+id_fields = ["gid"]
+headline_field = "alias_nature_n1"
+description_field = "localisation"
+valid_from_field = "date_debut"
+valid_to_field = "date_fin"
+lang = "fr"
+
+[[source]]
+id = "fr-lille"
+country = "FR"
+format = "geojson"
+url = "https://data.lillemetropole.fr/geoserver/wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=mel_espacepublic:travaux_7j_30k_troncon&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326"
+poll_secs = 3600
+licence = "etalab-2.0"
+attribution = "Métropole Européenne de Lille"
+routing = false
+
+[source.geojson]
+extra_urls = ["https://data.lillemetropole.fr/geoserver/wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=mel_espacepublic:travaux_7j_30k_carrefour&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326"]
+id_fields = ["type_operation", "objectid"]
+headline_field = "libelle_ope"
+description_field = "description_ope"
+valid_from_field = "date_demarrage"
+valid_to_field = "date_fin"
+lang = "fr"
+
+[[source]]
+id = "be-liege"
+country = "BE"
+format = "geojson"
+url = "https://www.odwb.be/api/explore/v2.1/catalog/datasets/infos-travaux/exports/geojson"
+poll_secs = 3600
+licence = "CC-BY-4.0"
+attribution = "Ville de Liège"
+routing = false
+
+[source.geojson]
+id_fields = ["id"]
+headline_field = "name"
+description_field = "description"
+valid_from_field = "start_date"
+valid_to_field = "tentative_end_date"
+lang = "fr"
+
+[[source]]
+id = "be-namur"
+country = "BE"
+format = "geojson"
+url = "https://www.odwb.be/api/explore/v2.1/catalog/datasets/namur-travaux-de-voiries/exports/geojson"
+poll_secs = 3600
+licence = "CC-BY-4.0"
+attribution = "Ville de Namur"
+routing = false
+
+[source.geojson]
+id_fields = ["code_rue", "datedebut", "localisation"]
+headline_field = "typetrav"
+description_field = "localisation"
+road_field = "nom"
+valid_from_field = "datedebut"
+valid_to_field = "datefin"
+lang = "fr"
+
+[[source.geojson.filters]]
+field = "encours"
+include = ["Oui"]
+
+[[source]]
+id = "lt-eismoinfo"
+country = "LT"
+format = "geojson"
+url = "https://restrictions.eismoinfo.lt/"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "Via Lietuva"
+
+[source.geojson]
+features_path = ""
+properties_path = ""
+id_fields = ["_id"]
+polyline_field = "location.polyline"
+type_field = "type"
+type_map = { "CONSTRUCTION" = "roadworks", "HAZARD" = "obstruction" }
+severity_field = "restrictions"
+closed_pattern = "roadClosed"
+restricted_pattern = "speedLimit|laneClosed|LD"
+headline_field = "shortDescription"
+description_field = "description"
+road_field = "location.street"
+valid_from_field = "startTime"
+valid_to_field = "endTime"
+lang = "lt"
+
+[[source]]
+id = "dk-kobenhavn"
+country = "DK"
+format = "datex"
+url = "https://kbhkort.kk.dk/media/datex2/trafikmelding.xml"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "Københavns Kommune"
+
+[[source]]
+id = "cy-pwd"
+country = "CY"
+format = "datex"
+url = "https://www.traffic4cyprus.org.cy/swarco3/api/Data/SituationPublication"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "Public Works Department, Cyprus (traffic4cyprus)"
+
+# Vienna writes closures in free text, so whole-street closures and lane closures are told apart by wording.
+[[source]]
+id = "at-wien"
+country = "AT"
+format = "geojson"
+url = "https://data.wien.gv.at/daten/geo?service=WFS&request=GetFeature&version=1.1.0&typeName=ogdwien:BAUSTELLENLINOGD&srsName=EPSG:4326&outputFormat=json"
+poll_secs = 3600
+licence = "CC-BY-4.0"
+attribution = "Stadt Wien – data.wien.gv.at"
+
+[source.geojson]
+id_fields = ["OBJECTID"]
+severity_field = "PRESSETEXT"
+closed_pattern = "gesperrt|sperre"
+closed_exception_pattern = "fahrstreifen.{0,40}gesperrt|gehsteig|radweg"
+restricted_pattern = "fahrstreifen|einengung"
+headline_field = "BEZEICHNUNG"
+description_field = "PRESSETEXT"
+lang = "de"
+
+[[source]]
+id = "at-salzburg"
+country = "AT"
+format = "geojson"
+url = "https://data.stadt-salzburg.at/geodaten/wfs?service=WFS&version=1.1.0&request=GetFeature&typeName=ogdsbg:baustelle&outputFormat=application/json&srsName=EPSG:4326"
+poll_secs = 3600
+licence = "CC-BY-3.0-AT"
+attribution = "Stadt Salzburg"
+
+[source.geojson]
+id_fields = ["NUMMER"]
+severity_field = "BEHINDERUNG"
+closed_pattern = "sperre der straße|straßensperre|totalsperre"
+restricted_pattern = "fahrstreifen|einengung|sperre"
+headline_field = "MASSNAHME"
+description_field = "BEHINDERUNG"
+valid_from_field = "BEGINN"
+valid_to_field = "ENDE"
+lang = "de"
+
+# Licence named only as open terms in the research. Confirm with the Kanton Zürich.
+[[source]]
+id = "ch-zh"
+country = "CH"
+format = "geojson"
+url = "https://maps.zh.ch/wfs/TbaBaustellenZHWFS?service=WFS&version=2.0.0&request=GetFeature&typeNames=ms:baustellen-uebersicht&outputFormat=geojson&srsName=EPSG:4326"
+poll_secs = 3600
+licence = "unconfirmed"
+attribution = "Kanton Zürich, Tiefbauamt"
+
+[source.geojson]
+id_fields = ["strassenbez", "kmvon", "kmbis"]
+severity_field = "verkehrsfuehrung"
+closed_pattern = "vollsperrung|ist gesperrt|wird gesperrt"
+closed_exception_pattern = "nächtlich|nachts|zeitweise|etappen"
+restricted_pattern = "einspurig|fahrstreifen|lichtsignal|einengung|sperrung"
+headline_field = "strassenname"
+description_field = "verkehrsfuehrung"
+road_field = "strassenbez"
+valid_from_field = "datum_baubeginn"
+valid_to_field = "datum_bauende"
+lang = "de"
+
+# Traffic Wales allows third-party apps that credit it and keep its links working.
+[[source]]
+id = "gb-wales-roadworks"
+country = "GB"
+format = "georss"
+url = "https://traffic.wales/feeds/roadworks/rss.xml"
+poll_secs = 600
+licence = "LicenseRef-Traffic-Wales-Terms"
+attribution = "Traffic Wales"
+
+[source.geojson]
+features_path = "items"
+properties_path = ""
+id_fields = ["guid"]
+lat_field = "lat"
+lon_field = "lon"
+default_type = "roadworks"
+severity_field = "description"
+closed_pattern = "\\bclosed\\b|closure"
+restricted_pattern = "lane|contraflow|lights|narrow"
+headline_field = "title"
+description_field = "description"
+lang = "en"
+
+[[source]]
+id = "gb-wales-incidents-events"
+country = "GB"
+format = "georss"
+url = "https://traffic.wales/feeds/incidents-events/rss.xml"
+poll_secs = 600
+licence = "LicenseRef-Traffic-Wales-Terms"
+attribution = "Traffic Wales"
+
+[source.geojson]
+features_path = "items"
+properties_path = ""
+id_fields = ["guid"]
+lat_field = "lat"
+lon_field = "lon"
+default_type = "obstruction"
+severity_field = "description"
+closed_pattern = "\\bclosed\\b|closure"
+restricted_pattern = "lane|contraflow|lights|narrow"
+headline_field = "title"
+description_field = "description"
+lang = "en"
+
+[[source]]
+id = "ca-bc-drivebc"
+country = "CA"
+format = "geojson"
+url = "https://api.open511.gov.bc.ca/events?format=json&limit=500"
+poll_secs = 300
+licence = "LicenseRef-OGL-BC"
+attribution = "DriveBC (Province of British Columbia)"
+
+[source.geojson]
+features_path = "events"
+properties_path = ""
+geometry_path = "geography"
+id_fields = ["id"]
+type_field = "event_type"
+type_map = { "CONSTRUCTION" = "roadworks", "INCIDENT" = "obstruction", "ROAD_CONDITION" = "conditions", "SPECIAL_EVENT" = "other", "WEATHER_CONDITION" = "conditions" }
+severity_field = "description"
+closed_pattern = "\\bclosed\\b|closure"
+restricted_pattern = "single lane|alternating|lane closure|delays"
+headline_field = "headline"
+description_field = "description"
+lang = "en"
+
+[[source]]
+id = "ca-qc-chantiers"
+country = "CA"
+format = "geojson"
+url = "https://ws.mapserver.transports.gouv.qc.ca/swtq?service=WFS&version=2.0.0&request=GetFeature&typename=ms:chantiers_mtmdet&outputformat=geojson&srsname=EPSG:4326"
+poll_secs = 1800
+licence = "CC-BY-4.0"
+attribution = "Ministère des Transports et de la Mobilité durable du Québec"
+
+[source.geojson]
+id_fields = ["identifiant"]
+severity_field = "entraveType"
+restricted_pattern = "majeure"
+headline_field = "identificationDesTravaux"
+road_field = "routeAutoroute"
+valid_from_field = "debut"
+valid_to_field = "fin"
+lang = "fr"
+
+[[source]]
+id = "ca-qc-evenements"
+country = "CA"
+format = "geojson"
+url = "https://ws.mapserver.transports.gouv.qc.ca/swtq?service=WFS&version=2.0.0&request=GetFeature&typename=ms:evenements&outputformat=geojson&srsname=EPSG:4326"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "Ministère des Transports et de la Mobilité durable du Québec"
+
+[source.geojson]
+id_fields = ["identifiant"]
+default_type = "obstruction"
+severity_field = "entrave"
+closed_values = ["Fermeture"]
+restricted_pattern = "alternance|contresens|fermeture de [0-9]+ voie"
+headline_field = "entrave"
+description_field = "localisation"
+road_field = "numeroRoute"
+lang = "fr"
+
+# Caltrans plans lane closures weeks ahead; each counts only during its own hours.
+[[source]]
+id = "us-ca-caltrans-d1"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d1/lcs/lcsStatusD01.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d2"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d2/lcs/lcsStatusD02.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d3"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d3/lcs/lcsStatusD03.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d4"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d4/lcs/lcsStatusD04.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d5"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d5/lcs/lcsStatusD05.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d6"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d6/lcs/lcsStatusD06.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d7"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d7/lcs/lcsStatusD07.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d8"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d8/lcs/lcsStatusD08.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d9"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d9/lcs/lcsStatusD09.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d10"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d10/lcs/lcsStatusD10.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d11"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d11/lcs/lcsStatusD11.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+[[source]]
+id = "us-ca-caltrans-d12"
+country = "US"
+format = "geojson"
+url = "https://cwwp2.dot.ca.gov/data/d12/lcs/lcsStatusD12.json"
+poll_secs = 1800
+licence = "LicenseRef-Caltrans-Conditions-of-Use"
+attribution = "Caltrans"
+horizon_days = 2
+
+[source.geojson]
+features_path = "data"
+properties_path = "lcs"
+id_fields = ["index"]
+both_directions = false
+start_lon_field = "location.begin.beginLongitude"
+start_lat_field = "location.begin.beginLatitude"
+end_lon_field = "location.end.endLongitude"
+end_lat_field = "location.end.endLatitude"
+severity_field = "closure.typeOfClosure"
+closed_values = ["Full"]
+restricted_values = ["Lane", "One-Way Traffic", "Moving"]
+headline_field = "closure.typeOfWork"
+road_field = "location.begin.beginRoute"
+valid_from_field = "closure.closureTimestamp.closureStartEpoch"
+valid_to_field = "closure.closureTimestamp.closureEndEpoch"
+lang = "en"
+
+# US WZDx v4 feeds without a key, from the USDOT feed registry. The WZDx specification requires CC0 for public feeds.
+[[source]]
+id = "us-wzdx-minnesota-minnesota-dot"
+country = "US"
+format = "geojson"
+url = "https://mn.carsprogram.org/carsapi_v1/api/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Minnesota DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-maryland-maryland-dot"
+country = "US"
+format = "geojson"
+url = "https://filter.ritis.org/wzdx_v4.1/mdot.geojson"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Maryland DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-arizona-maricopa-county-dot"
+country = "US"
+format = "geojson"
+url = "https://wzdxapi.aztech.org/construction"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Maricopa County DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-missouri-missouri-dot"
+country = "US"
+format = "geojson"
+url = "https://traveler.modot.org/timconfig/feed/desktop/mo_wzdx.json"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Missouri DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-washington-washington-state-dot"
+country = "US"
+format = "geojson"
+url = "https://wzdx.wsdot.wa.gov/api/v4/WorkZoneFeed"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Washington State DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-missouri-st-charles-county"
+country = "US"
+format = "geojson"
+url = "https://scc.ridsi-dash.com:5000/wzdx.geojson"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "St. Charles County"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-new-jersey-new-jersey-institute-of-techn"
+country = "US"
+format = "geojson"
+url = "https://smartworkzones.njit.edu/nj/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "New Jersey Institute of Technology"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-kentucky-kentucky-transportation-cabinet"
+country = "US"
+format = "geojson"
+url = "https://storage.googleapis.com/kytc-its-2020-openrecords/public/feeds/WZDx/kytc_wzdx_v4.1.geojson"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Kentucky Transportation Cabinet"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-kansas-kansas-dot"
+country = "US"
+format = "geojson"
+url = "https://ks.carsprogram.org/carsapi_v1/api/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Kansas DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-texas-city-of-austin"
+country = "US"
+format = "geojson"
+url = "https://data.austintexas.gov/download/d9mm-cjw9"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "City of Austin"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-delaware-delaware-dot"
+country = "US"
+format = "geojson"
+url = "https://wzdx.e-dot.com/del_dot_feed_wzdx_v4.1.geojson"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Delaware DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-louisiana-louisiana-dotd"
+country = "US"
+format = "geojson"
+url = "https://wzdx.e-dot.com/la_dot_d_feed_wzdx_v4.1.geojson"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Louisiana DOTD"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-idaho-idaho-dot"
+country = "US"
+format = "geojson"
+url = "https://511.idaho.gov/api/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Idaho DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-indiana-indiana-dot"
+country = "US"
+format = "geojson"
+url = "https://in.carsprogram.org/carsapi_v1/api/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Indiana DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-new-hampshire-nhdot-vtaot-medot"
+country = "US"
+format = "geojson"
+url = "https://api.dx.ne-compass.com/wzdx-latest/"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "NHDOT/VTAOT/MEDOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-mississippi-mississippi-dot"
+country = "US"
+format = "geojson"
+url = "https://api.mdottraffic.com/prod/v3/data/wzdx"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Mississippi DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-north-dakota-north-dakota-dot"
+country = "US"
+format = "geojson"
+url = "https://travelfiles.dot.nd.gov/geojson_nc/wzdx_geojson.json"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "North Dakota DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "us-wzdx-florida-florida-dot"
+country = "US"
+format = "geojson"
+url = "https://api.depot.fdot.gov/wzdx-latest"
+poll_secs = 300
+licence = "CC0-1.0"
+attribution = "Florida DOT"
+
+[source.geojson]
+type_field = "core_details.event_type"
+type_map = { "work-zone" = "roadworks", "detour" = "skip" }
+severity_field = "vehicle_impact"
+both_directions = false
+closed_values = ["all-lanes-closed"]
+restricted_values = ["some-lanes-closed", "some-lanes-closed-merge-left", "some-lanes-closed-merge-right", "some-lanes-closed-split", "alternating-one-way", "flagging", "temporary-traffic-signal"]
+headline_field = "core_details.description"
+road_field = "core_details.road_names"
+valid_from_field = "start_date"
+valid_to_field = "end_date"
+lang = "en"
+
+[[source]]
+id = "au-wa-mainroads"
+country = "AU"
+format = "geojson"
+url = "https://services2.arcgis.com/cHGEnmsJ165IBJRM/arcgis/rest/services/WebEoc_RoadClosures/FeatureServer/4/query?where=publishExt%3D%27Yes%27&outFields=*&returnGeometry=true&outSR=4326&resultRecordCount=2000&f=geojson"
+poll_secs = 600
+licence = "CC-BY-4.0"
+attribution = "Main Roads Western Australia"
+
+[source.geojson]
+id_fields = ["Id"]
+type_field = "IncidentTy"
+default_type = "obstruction"
+severity_field = "ClosureTyp"
+closed_pattern = "closed"
+closed_exception_pattern = "open"
+restricted_pattern = "caution|lane"
+headline_field = "Location"
+road_field = "Road"
+lang = "en"
+
+# South Australia's roadworks say nothing about lanes or closures, so they only show on the map. Its closures come in a layer of their own.
+[[source]]
+id = "au-sa-roadworks"
+country = "AU"
+format = "geojson"
+url = "https://maps.sa.gov.au/arcgis/rest/services/DPTIExtTransport/TrafficSAOpenData/MapServer/0/query?where=1%3D1&outFields=*&resultRecordCount=2000&f=geojson"
+poll_secs = 900
+licence = "CC-BY-3.0-AU"
+attribution = "Department for Infrastructure and Transport, South Australia"
+routing = false
+
+[source.geojson]
+id_fields = ["ROADWORKS_AND_INCIDENTS_ID"]
+type_field = "REC_TYPE"
+type_map = { "INCIDENT" = "obstruction" }
+headline_field = "DESCRIPTION"
+road_field = "LOCAL_ROAD"
+valid_from_field = "START_DATE"
+valid_to_field = "END_DATE"
+lang = "en"
+
+[[source]]
+id = "au-sa-closures"
+country = "AU"
+format = "geojson"
+url = "https://maps.sa.gov.au/arcgis/rest/services/DPTIExtTransport/TrafficSAOpenData/MapServer/1/query?where=1%3D1&outFields=*&f=geojson"
+poll_secs = 600
+licence = "CC-BY-3.0-AU"
+attribution = "Department for Infrastructure and Transport, South Australia"
+
+[source.geojson]
+id_fields = ["LOCATION_ID"]
+default_type = "closure"
+headline_field = "PLOT_DETAILS"
+road_field = "LOCAL_ROAD_NAME"
+lang = "en"
+
+[[source]]
+id = "nz-nzta"
+country = "NZ"
+format = "geojson"
+url = "https://services.arcgis.com/CXBb7LAjgIIdcsPt/arcgis/rest/services/NZTA_Highway_Information/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&resultRecordCount=2000&f=geojson"
+poll_secs = 900
+licence = "CC-BY-4.0"
+attribution = "NZ Transport Agency Waka Kotahi"
+
+[source.geojson]
+extra_urls = ["https://services.arcgis.com/CXBb7LAjgIIdcsPt/arcgis/rest/services/NZTA_Highway_Information/FeatureServer/1/query?where=1%3D1&outFields=*&outSR=4326&resultRecordCount=2000&f=geojson"]
+id_fields = ["OBJECTID"]
+type_field = "eventType"
+type_map = { "Road Work" = "roadworks", "Scheduled Road Work" = "roadworks", "Road Hazard" = "obstruction" }
+severity_field = "impact"
+closed_values = ["Road Closed"]
+restricted_values = ["Delays"]
+headline_field = "eventDescription"
+valid_from_field = "startDate"
+valid_to_field = "endDate"
+lang = "en"

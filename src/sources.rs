@@ -26,6 +26,8 @@ pub enum Format {
     CatalunyaSct,
     /// Plain GeoJSON, described by the source's `geojson` table.
     Geojson,
+    /// A GeoRSS feed, its items described by the source's `geojson` table.
+    Georss,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -44,6 +46,8 @@ pub struct Source {
     /// False for sources too vague for routing, such as roadworks without any word on how they affect traffic.
     #[serde(default = "default_true")]
     pub routing: bool,
+    /// Drops incidents starting more than this many days ahead, for planning feeds that reach months into the future.
+    pub horizon_days: Option<i64>,
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
     pub geojson: Option<GeoJsonConfig>,
@@ -76,9 +80,20 @@ pub fn fetch(src: &Source, http: &Http, now: DateTime<Utc>) -> Result<Vec<Incide
                 .collect::<Result<Vec<Value>>>()?;
             geojson::parse(&bodies, config)?
         }
+        Format::Georss => {
+            let config = src.geojson.as_ref().context("a georss source needs a geojson table")?;
+            let bodies = std::iter::once(&src.url)
+                .chain(&config.extra_urls)
+                .map(|url| geojson::rss_items(&http.get_text(url, &src.headers)?))
+                .collect::<Result<Vec<Value>>>()?;
+            geojson::parse(&bodies, config)?
+        }
     };
     let total = incidents.len();
-    incidents.retain(|i| !i.expired(now) && !i.shape.is_empty());
+    let horizon = src.horizon_days.map(|d| now + chrono::Duration::days(d));
+    incidents.retain(|i| {
+        !i.expired(now) && !i.shape.is_empty() && horizon.is_none_or(|h| i.valid_from.is_none_or(|from| from <= h))
+    });
     for inc in &mut incidents {
         inc.id = format!("{}:{}", src.id, inc.id);
         inc.source = src.id.clone();
