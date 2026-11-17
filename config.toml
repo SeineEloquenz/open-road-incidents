@@ -1065,7 +1065,7 @@ country = "CH"
 format = "geojson"
 url = "https://maps.zh.ch/wfs/TbaBaustellenZHWFS?service=WFS&version=2.0.0&request=GetFeature&typeNames=ms:baustellen-uebersicht&outputFormat=geojson&srsName=EPSG:4326"
 poll_secs = 3600
-licence = "unconfirmed"
+licence = "LicenseRef-OGD-Kanton-Zuerich"
 attribution = "Kanton Zürich, Tiefbauamt"
 
 [source.geojson]
@@ -1708,7 +1708,7 @@ lang = "en"
 id = "us-wzdx-kansas-kansas-dot"
 country = "US"
 format = "geojson"
-url = "https://ks.carsprogram.org/carsapi_v1/api/wzdx"
+url = "https://kscars.kandrive.gov/carsapi_v1/api/wzdx"
 poll_secs = 300
 licence = "CC0-1.0"
 attribution = "Kansas DOT"
@@ -1798,7 +1798,7 @@ country = "US"
 format = "geojson"
 url = "https://511.idaho.gov/api/wzdx"
 poll_secs = 300
-licence = "CC0-1.0"
+licence = "unconfirmed"
 attribution = "Idaho DOT"
 
 [source.geojson]
@@ -1842,7 +1842,7 @@ country = "US"
 format = "geojson"
 url = "https://api.dx.ne-compass.com/wzdx-latest/"
 poll_secs = 300
-licence = "CC0-1.0"
+licence = "unconfirmed"
 attribution = "NHDOT/VTAOT/MEDOT"
 
 [source.geojson]
@@ -1908,7 +1908,7 @@ country = "US"
 format = "geojson"
 url = "https://api.depot.fdot.gov/wzdx-latest"
 poll_secs = 300
-licence = "CC0-1.0"
+licence = "unconfirmed"
 attribution = "Florida DOT"
 
 [source.geojson]
