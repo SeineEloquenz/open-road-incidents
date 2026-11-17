@@ -6,7 +6,10 @@ let
   graphDir = "${dataDir}/valhalla";
   listen = "127.0.0.1:${toString cfg.valhalla.port}";
 
-  valhallaConfig = pkgs.runCommand "valhalla.json" { nativeBuildInputs = [ cfg.valhalla.package ]; } ''
+  jsonFormat = pkgs.formats.json { };
+  valhallaOverrides = jsonFormat.generate "valhalla-overrides.json" cfg.valhalla.settings;
+
+  valhallaConfig = pkgs.runCommand "valhalla.json" { nativeBuildInputs = [ cfg.valhalla.package pkgs.jq ]; } ''
     valhalla_build_config \
       --mjolnir-tile-extract ${graphDir}/valhalla_tiles.tar \
       --mjolnir-traffic-extract ${graphDir}/traffic.tar \
@@ -16,7 +19,8 @@ let
       --httpd-service-listen tcp://${listen} \
       --httpd-service-loopback ipc://${graphDir}/loopback \
       --httpd-service-interrupt ipc://${graphDir}/interrupt \
-      > $out
+      > base.json
+    jq -s '.[0] * .[1]' base.json ${valhallaOverrides} > $out
   '';
 
   settings = {
@@ -65,6 +69,17 @@ in
         type = lib.types.ints.positive;
         default = 2;
         description = "Valhalla worker threads.";
+      };
+      settings = lib.mkOption {
+        type = jsonFormat.type;
+        default = { };
+        example = { logging.color = false; };
+        description = "Values merged over the generated valhalla.json. Valhalla has no log level, so `logging.type = \"\"` silences warnings and errors too.";
+      };
+      logRequests = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Log every request, its successful response and the per-request INFO lines. Disabling this keeps warnings, errors and failed responses.";
       };
     };
 
@@ -158,6 +173,11 @@ in
         ProtectHome = true;
         PrivateTmp = true;
         ReadWritePaths = [ graphDir ];
+        # prime_server's access log cannot be turned off in valhalla.json
+        LogFilterPatterns = lib.mkIf (!cfg.valhalla.logRequests) [
+          "~\\[INFO\\]"
+          "~^[0-9]+ [0-9/]+ [0-9:.]+ (GET |POST |2[0-9]{2} )"
+        ];
       };
     };
 

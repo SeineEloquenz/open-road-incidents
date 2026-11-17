@@ -47,6 +47,8 @@ services.open-road-incidents = {
 };
 ```
 
+Valhalla logs every request. `valhalla.logRequests = false` keeps only warnings, errors and failed responses. `valhalla.settings` is merged over the generated `valhalla.json`.
+
 `build-graph` keeps Geofabrik extracts current with daily diffs, keeps only roads, ferries and turn restrictions, and rebuilds only when an extract changed. Finished files land in `DIR/ready`. `CONCURRENCY` limits build threads, which lowers memory use, and `FORCE=1` rebuilds unchanged extracts.
 
 With `graph.enable` the server does this itself on a schedule, monthly by default, at low priority, and swaps the new graph in:
