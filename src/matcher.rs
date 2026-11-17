@@ -15,6 +15,7 @@ const MAX_UNMATCHED_SHARE: f64 = 0.2;
 const MAX_POINT_OFFSET_M: f64 = 50.0;
 const MAX_NAMED_POINT_OFFSET_M: f64 = 200.0;
 const MAX_DETOUR_FACTOR: f64 = 3.0;
+const SPARSE_SEGMENT_M: f64 = 500.0;
 
 const CACHE_VERSION: u32 = 4;
 
@@ -131,7 +132,7 @@ impl Matcher {
                     let reversed = both_directions.then(|| l.iter().rev().copied().collect::<Vec<_>>());
                     [Some(l.clone()), reversed].into_iter().flatten()
                 })
-                .map(|l| self.trace(&l, "map_snap"))
+                .map(|l| self.line(&l))
                 .collect::<Result<_>>()?,
             Shape::Spans(spans) => spans.iter().map(|s| self.span(*s)).collect::<Result<_>>()?,
             Shape::Points(points) => points.iter().map(|p| self.locate(*p, road)).collect::<Result<_>>()?,
@@ -141,6 +142,24 @@ impl Matcher {
             all.extend(part);
         }
         Ok(any.then_some(all))
+    }
+
+    /// Lines drawn with vertices far apart cannot be traced, so each of their segments is routed instead.
+    fn line(&self, line: &[Coord]) -> Result<Option<Matched>> {
+        if let Some(m) = self.trace(line, "map_snap")? {
+            return Ok(Some(m));
+        }
+        if line.windows(2).all(|w| geo::distance(w[0], w[1]) < SPARSE_SEGMENT_M) {
+            return Ok(None);
+        }
+        let mut all = Matched::default();
+        for w in line.windows(2) {
+            match self.span([w[0], w[1]])? {
+                Some(m) => all.extend(m),
+                None => return Ok(None),
+            }
+        }
+        Ok(Some(all))
     }
 
     fn trace(&self, line: &[Coord], mode: &str) -> Result<Option<Matched>> {
