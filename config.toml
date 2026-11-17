@@ -650,12 +650,14 @@ licence = "CC-BY-4.0"
 attribution = "Vegagerðin (Icelandic Road and Coastal Administration)"
 
 [source.geojson]
-crs = 3057
+crs = 4326
 id_fields = ["ASTAND", "X", "Y", "STARTTIME"]
 type_field = "DESCRIPTION"
 type_map = { "Closed" = "closure", "Road repairs" = "roadworks", "Uneven road" = "conditions", "Flying gravel" = "conditions", "Animals on the road" = "obstruction", "Holes in road" = "obstruction", "Total axle weight limit" = "restriction" }
 default_type = "obstruction"
 headline_field = "DESCRIPTION"
+valid_from_field = "STARTTIME"
+valid_to_field = "STOPTIME"
 lon_field = "X"
 lat_field = "Y"
 
@@ -669,7 +671,7 @@ licence = "CC-BY-4.0"
 attribution = "Vegagerðin (Icelandic Road and Coastal Administration)"
 
 [source.geojson]
-crs = 3057
+crs = 4326
 id_fields = ["IDBUTUR"]
 type_field = "ROADCONDITION"
 type_map = { "Closed" = "closure", "Impassable" = "closure", "Impassable because of snow or weather" = "conditions", "Road repairs" = "roadworks", "Spots of ice" = "conditions", "Mountain vehicles" = "restriction", "No winter services" = "conditions" }

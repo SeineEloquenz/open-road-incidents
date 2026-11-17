@@ -113,6 +113,13 @@ mod tests {
     }
 
     #[test]
+    fn isn93_matches_source_coordinates() {
+        let [lon, lat] = from_epsg(3057, 741272.0, 513724.0).unwrap();
+        assert!((lon - -13.872839).abs() < 1e-4, "{lon}");
+        assert!((lat - 65.035293).abs() < 1e-4, "{lat}");
+    }
+
+    #[test]
     fn polyline_known_value() {
         let pts = decode_polyline("_p~iF~ps|U_ulLnnqC_mqNvxq`@", 1e5);
         assert_eq!(pts, vec![[-120.2, 38.5], [-120.95, 40.7], [-126.453, 43.252]]);
