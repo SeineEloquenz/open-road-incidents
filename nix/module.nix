@@ -245,7 +245,7 @@ in
             add_header Access-Control-Allow-Origin "*";
           '';
         };
-        locations."= /route" = {
+        locations."~ ^/(route|trace_attributes)$" = {
           proxyPass = "http://${listen}";
           extraConfig = ''
             limit_req zone=ori_route burst=10 nodelay;
